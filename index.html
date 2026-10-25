@@ -3,991 +3,2162 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="しらすのキッチンカー「とりおんずキッチン」で、お客さんの注文どおりにしらすライスバーガー・塩焼きそば・たまごスープを作って提供する調理ゲーム。">
-<meta property="og:title" content="とりおんずキッチン">
-<meta property="og:description" content="しらすのキッチンカー調理ゲーム">
+<meta name="description" content="地域おこし協力隊として愛知県南知多町で3年間を過ごし、町の魅力と課題を見つけて関係人口と新しい産業を生み出すロールプレイングゲーム。">
+<meta property="og:title" content="つなぐ南知多">
+<meta property="og:description" content="南知多町を舞台にした地域おこしロールプレイングゲーム">
 <meta property="og:type" content="website">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
-<script>window.KITCHEN_RANKING_URL="https://script.google.com/macros/s/AKfycbz-rfuckSP1dzlJVm035xn_bzy165-WonwhJOXbz6_31Qvr0pzQ4W2b4pv9_k6j97X2/exec";</script>
-<script>window.KITCHEN_BGM_VIDEO="GNTuPH88FvI";</script>
-<title>とりおんずキッチン</title>
+<script>window.TSUNAGU_RANKING_URL="https://script.google.com/macros/s/AKfycbyQlkCbULADks0rjJLD-2PuidN4jTi7_UGHDikIEWEhfLNrlNG8Q4qKq4NFha7xYkaxwQ/exec";</script>
+<title>つなぐ南知多</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style>
-/* Layout: 窓口（お客さん）→ 提供カウンター → 調理場3ステーション（鉄板／バーガー台／焼きそば・スープ）。車体ティールと海の単一テーマ、太い墨線のステッカー調 */
-:root{
-  --car:#3fb8a8; --car-dk:#1f7d70; --sky:#c4e9f6; --sea:#2b88b0; --sea-lt:#5fb3d3;
-  --awn1:#fbf8f1; --awn2:#e9564c;
-  --steel:#e4eaec; --steel-dk:#9fb0b7; --grill:#2b3135; --grill-lt:#3d464b;
-  --wood:#e2b578; --wood-dk:#b07a3c;
-  --ink:#1f2d33; --paper:#ffffff; --muted:#56666d;
-  --ok:#2e9e5b; --warn:#e8a321; --bad:#d6453b; --hi:#ffd84a;
-  --display:"Dela Gothic One","Hiragino Sans","Yu Gothic",sans-serif;
-  --body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Yu Gothic UI","Yu Gothic",sans-serif;
-  color-scheme:light;
+/* Layout: 海図のような地図を主役に、右に現在地の行動パネル、画面下にRPGの会話窓を固定 */
+:root {
+  --bg: #e6eeeb;
+  --sea: #cfe2de;
+  --sea-line: #b3cfc9;
+  --land: #f2e9d3;
+  --land-edge: #c9b88f;
+  --ink: #1e3640;
+  --ink-soft: #546d74;
+  --card: #fffcf5;
+  --paper: #fbf7ec;
+  --line: #d6ccb4;
+  --tai: #c0472f;
+  --tai-soft: #f6dcd3;
+  --nori: #2c5b4c;
+  --nori-soft: #d9e9e1;
+  --mikan: #c98414;
+  --mikan-soft: #f7e6c4;
+  --shadow: 0 1px 0 rgba(30,54,64,.08), 0 6px 18px rgba(30,54,64,.08);
+  --f-pixel: "DotGothic16", "Hiragino Kaku Gothic ProN", "Yu Gothic", monospace;
+  --f-body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
 }
-html,body{background:var(--car);color:var(--ink)}
-body{font-family:var(--body);font-weight:500;
-  background:var(--car) radial-gradient(rgba(255,255,255,.12) 2px,transparent 2.5px) 0 0/22px 22px}
-*{box-sizing:border-box}
-[hidden]{display:none!important}
-#app{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:12px;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 28px}
-button{font-family:inherit;color:inherit}
-
-/* ---- header ---- */
-.topbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;
-  background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:8px 14px;box-shadow:0 4px 0 var(--ink)}
-.logo{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.logo b{font-family:var(--display);font-weight:400;font-size:22px;letter-spacing:.02em}
-.logo small{font-size:12px;color:var(--muted)}
-.stats{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.stat{display:flex;flex-direction:column;align-items:flex-start;line-height:1.1;padding:4px 10px;border-radius:10px;background:var(--steel)}
-.stat span{font-size:10px;color:var(--muted);letter-spacing:.08em}
-.stat strong{font-family:var(--display);font-weight:400;font-size:18px;font-variant-numeric:tabular-nums}
-.stat.time.low strong{color:var(--bad)}
-.hearts{color:var(--bad);letter-spacing:1px}
-.hearts .off{color:#c8d0d3}
-.tools{display:flex;gap:6px}
-
-/* ---- buttons ---- */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:700;font-size:14px;
-  background:var(--paper);border:2px solid var(--ink);border-radius:10px;padding:7px 10px;cursor:pointer;
-  box-shadow:0 3px 0 var(--ink);transition:transform .05s,box-shadow .05s;line-height:1.2;text-align:center}
-.btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
-.btn:disabled{opacity:.4;cursor:not-allowed}
-.btn:focus-visible,.cust:focus-visible,.slot-hit:focus-visible,.citem:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
-.btn.small{font-size:12px;padding:5px 8px}
-.btn.go{background:var(--hi)}
-.btn.warn{background:#fde3df}
-.chip{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--ink);flex:none}
-.btn .cnt{font-family:var(--display);font-weight:400;font-size:12px;background:var(--ink);color:var(--paper);border-radius:8px;padding:0 6px}
-
-/* ---- service window ---- */
-.window{position:relative;border:3px solid var(--ink);border-radius:16px;overflow:hidden;box-shadow:0 4px 0 var(--ink);
-  background:linear-gradient(var(--sky) 0 58%,var(--sea-lt) 58% 63%,var(--sea) 63%)}
-.awning{height:26px;border-bottom:3px solid var(--ink);
-  background:repeating-linear-gradient(90deg,var(--awn1) 0 30px,var(--awn2) 30px 60px)}
-.window::before{content:"";position:absolute;left:8%;top:44%;width:120px;height:26px;border-radius:60px 60px 0 0;background:#8fc7a2;opacity:.8}
-.window::after{content:"";position:absolute;left:0;right:0;top:72%;height:6px;
-  background:radial-gradient(circle at 10px -2px,transparent 8px,rgba(255,255,255,.35) 9px,transparent 10px) 0 0/40px 6px repeat-x}
-#customers{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:10px 12px 0;min-height:216px;align-items:end}
-.empty-q{grid-column:1/-1;align-self:center;text-align:center;color:var(--ink);font-weight:700;opacity:.6}
-.cust{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;min-width:0}
-.cust.enter{animation:hop .45s ease-out}
-@keyframes hop{0%{transform:translateY(30px);opacity:0}70%{transform:translateY(-4px);opacity:1}100%{transform:none}}
-.ticket{background:var(--paper);border:2px solid var(--ink);border-radius:6px;padding:4px 8px 5px;font-size:12px;width:100%;max-width:190px;
-  box-shadow:0 2px 0 var(--ink);position:relative}
-.ticket .no{font-size:10px;color:var(--muted);display:flex;justify-content:space-between}
-.ticket ul{list-style:none;margin:2px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
-.ticket li{display:flex;align-items:center;gap:4px;font-weight:700;line-height:1.2}
-.ticket li svg{width:22px;height:22px;flex:none}
-.ticket li.done{color:var(--ok);text-decoration:line-through}
-.cust:hover .ticket{background:#fffbe2}
-.cust-svg{width:76px;height:88px;display:block;margin-bottom:-2px}
-.pbar{width:76px;height:8px;border:2px solid var(--ink);border-radius:6px;background:var(--paper);overflow:hidden;margin-bottom:8px}
-.pbar i{display:block;height:100%;width:100%;background:var(--ok)}
-.say{position:absolute;top:-6px;left:50%;transform:translate(-50%,-100%);background:var(--ink);color:var(--paper);font-size:12px;font-weight:700;
-  padding:3px 8px;border-radius:8px;white-space:nowrap;z-index:3}
-.cust .say{top:auto;bottom:96px;transform:translateX(-50%)}
-
-/* ---- counter ---- */
-.counter{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--wood);border:3px solid var(--ink);border-radius:14px;
-  padding:8px 12px;box-shadow:0 4px 0 var(--wood-dk),0 4px 0 2px var(--ink)}
-.counter h3{margin:0;font-size:13px;font-weight:900;writing-mode:horizontal-tb;min-width:max-content}
-.counter h3 small{display:block;font-weight:500;font-size:11px}
-#counter{display:flex;gap:8px;flex-wrap:wrap;flex:1;min-height:58px;align-items:center}
-.citem{cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;width:66px;height:58px;background:var(--paper);
-  border:2px solid var(--ink);border-radius:10px;font-size:10px;font-weight:700;box-shadow:0 3px 0 var(--ink);padding:2px}
-.citem svg{width:32px;height:32px}
-.citem.sel{background:var(--hi);transform:translateY(-4px);box-shadow:0 6px 0 var(--ink)}
-.counter .hint{font-size:12px;color:var(--ink);opacity:.75}
-
-/* ---- kitchen ---- */
-.kitchen{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:12px;align-items:start}
-@media (max-width:860px){.kitchen{grid-template-columns:1fr}}
-.station{background:var(--steel);border:3px solid var(--ink);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0;box-shadow:0 4px 0 var(--ink)}
-.station h2{margin:0;font-family:var(--display);font-weight:400;font-size:17px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.station h2 small{font-family:var(--body);font-size:11px;color:var(--muted);font-weight:700}
-.row{display:flex;flex-wrap:wrap;gap:6px}
-.recipe-card{background:var(--paper);border:2px dashed var(--steel-dk);border-radius:10px;padding:6px 10px;font-size:12px;line-height:1.5}
-.recipe-card ol{margin:0;padding-left:18px}
-.recipe-card b{font-size:11px;color:var(--muted)}
-.nexthint{font-size:13px;font-weight:900;text-align:center;border-radius:8px;padding:3px 6px;background:#dff3e6;color:var(--ok)}
-.nexthint.bad{background:#fde3df;color:var(--bad)}
-
-/* grill */
-#grill{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;background:var(--grill);border:3px solid var(--ink);border-radius:12px;padding:8px}
-.slot{background:var(--grill-lt);border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:5px;min-height:118px;
-  background-image:repeating-linear-gradient(0deg,transparent 0 9px,rgba(0,0,0,.18) 9px 11px)}
-.slot.empty{align-items:center;justify-content:center;color:#8d9aa0;font-size:12px;font-weight:700}
-.slot-hit{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:4px;border-radius:6px}
-.slot-label{font-size:11px;font-weight:700;color:#f3f6f7;text-align:center;line-height:1.25}
-.slot.done .slot-label{color:var(--hi)}
-.slot.burnt .slot-label{color:#ff9a8f}
-.bar{height:6px;border-radius:4px;background:rgba(255,255,255,.15);overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:var(--warn)}
-.soba-acts{display:grid;grid-template-columns:1fr 1fr;gap:4px}
-.mini{font-family:inherit;font-weight:700;font-size:11px;padding:4px 2px;border-radius:7px;border:2px solid var(--ink);background:var(--paper);cursor:pointer;box-shadow:0 2px 0 #000}
-.mini:disabled{background:#9fd8b4;opacity:.85;cursor:default;box-shadow:none}
-.mini.plate{grid-column:1/-1;background:var(--hi)}
-
-.food{position:relative;flex:none}
-.food.patty{width:62px;height:40px;border-radius:50%;border:2px solid var(--ink);
-  background:radial-gradient(#fff 1px,transparent 1.6px) 0 0/6px 6px,#efe8d4}
-.food.patty::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,#c98a45,#93561d);opacity:calc(var(--p,0)*.62)}
-.food.egg{width:62px;height:42px;border-radius:46% 54% 50% 48%;border:2px solid var(--ink);background:rgba(255,255,255,calc(.3 + var(--p,0)*.7))}
-.food.egg::after{content:"";position:absolute;width:20px;height:20px;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;background:#f5b324;border:2px solid var(--ink)}
-.food.soba{width:74px;height:44px;border-radius:44%;border:2px solid var(--ink);overflow:hidden;
-  background:repeating-linear-gradient(32deg,#e1b06a 0 3px,#bf8641 3px 5px),#d39d55;filter:brightness(calc(1.12 - var(--p,0)*.15))}
-.food .t-shirasu,.food .t-ooba{position:absolute;inset:0}
-.food .t-shirasu{background:radial-gradient(ellipse 4px 1.6px,#fff 85%,transparent) 2px 4px/11px 9px}
-.food .t-ooba{background:radial-gradient(ellipse 5px 3px,#3f9a3a 85%,transparent) 6px 1px/17px 13px}
-.food.burnt{background:#3b2a20 !important;filter:none}
-.food.burnt::after{background:#1c120c;opacity:.75}
-
-.tray{background:#cfd8dc;border:2px solid var(--ink);border-radius:10px;padding:6px 10px;font-size:12px;font-weight:700;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.tray .ti{display:flex;align-items:center;gap:5px}
-.tray .mini-patty{width:22px;height:14px;border-radius:50%;border:1.5px solid var(--ink);background:#d5a467}
-.tray .mini-egg{width:22px;height:14px;border-radius:50%;border:1.5px solid var(--ink);background:radial-gradient(circle,#f5b324 0 4px,#fff 4.5px)}
-.tray .n{font-family:var(--display);font-weight:400;font-size:14px;font-variant-numeric:tabular-nums}
-
-/* burger board */
-.board{background:var(--wood);border:3px solid var(--ink);border-radius:12px;min-height:182px;padding:10px;display:flex;flex-direction:column-reverse;align-items:center;justify-content:flex-start;gap:1px;position:relative}
-.board .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#7a5428;text-align:center;padding:10px}
-.layer{border:2px solid var(--ink);flex:none}
-.l-rice{width:138px;height:22px;border-radius:12px;background:radial-gradient(#fff 1px,transparent 1.6px) 0 0/6px 6px,linear-gradient(#f3ead2,#d7b07a)}
-.l-lettuce{width:152px;height:11px;border-radius:9px;background:#6cbf4f}
-.l-egg{width:146px;height:13px;border-radius:8px;background:radial-gradient(ellipse 24px 9px,#f5b324 95%,transparent) center/100% 100% no-repeat,#fffdf5}
-.l-tomato{width:136px;height:10px;border-radius:6px;background:#e5483d}
-.l-shirasu{width:140px;height:11px;border-radius:6px;background:radial-gradient(ellipse 4px 1.6px,#fff 85%,transparent) 0 0/9px 6px,#e6dcc4}
-.l-jelly{width:132px;height:8px;border-radius:6px;background:rgba(196,120,40,.55)}
-.ing-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-.ing-grid .btn{padding:7px 4px;font-size:13px}
-
-/* side station */
-.sub{background:var(--paper);border:2px solid var(--ink);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:8px}
-.sub h4{margin:0;font-size:13px;font-weight:900;display:flex;justify-content:space-between}
-.sub h4 small{font-weight:700;color:var(--muted);font-size:11px}
-.vis{display:flex;justify-content:center;align-items:center;height:92px;background:var(--paper);border:2px solid var(--ink);border-radius:8px}
-.col{display:flex;flex-direction:column;gap:12px;min-width:0}
-.vis svg{height:84px;width:auto}
-
-/* overlays */
-.overlay{position:fixed;inset:0;z-index:20;background:rgba(20,40,46,.55);display:flex;align-items:center;justify-content:center;
-  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));overflow:auto}
-.panel{background:var(--paper);border:3px solid var(--ink);border-radius:18px;box-shadow:0 6px 0 var(--ink);padding:20px 22px;max-width:620px;width:100%;max-height:100%;overflow:auto}
-.panel h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,6vw,40px);margin:0;line-height:1.1;text-wrap:balance}
-.panel h2{font-family:var(--display);font-weight:400;font-size:22px;margin:0 0 8px}
-.panel p,.panel li{line-height:1.7;font-size:14px}
-.panel ul{padding-left:20px;margin:8px 0}
-.menu3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
-.menu3 div{border:2px solid var(--ink);border-radius:12px;padding:8px 6px;text-align:center;font-size:12px;font-weight:700;background:var(--steel)}
-.menu3 svg{width:46px;height:46px;display:block;margin:0 auto 2px}
-.menu3 em{font-style:normal;display:block;color:var(--muted);font-variant-numeric:tabular-nums}
-.choices{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.choices .btn{flex:1;min-width:150px;flex-direction:column;padding:10px}
-.choices .btn small{font-weight:500;font-size:11px}
-.best{font-size:12px;color:var(--muted);margin-top:10px}
-.rcp{display:grid;gap:10px}
-.rcp section{border:2px solid var(--ink);border-radius:12px;padding:8px 12px;background:var(--steel)}
-.rcp h3{margin:0;font-size:15px;display:flex;align-items:center;gap:6px}
-.rcp h3 svg{width:28px;height:28px}
-.rcp ol{margin:4px 0 0;padding-left:20px;font-size:13px;line-height:1.6}
-.stack-order{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
-.stack-order span{font-size:12px;background:var(--paper);border:1.5px solid var(--ink);border-radius:6px;padding:0 6px}
-.result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
-.result-grid div{background:var(--steel);border-radius:10px;padding:8px 10px}
-.result-grid span{display:block;font-size:11px;color:var(--muted)}
-.result-grid strong{font-family:var(--display);font-weight:400;font-size:22px;font-variant-numeric:tabular-nums}
-.rank{font-family:var(--display);font-size:64px;line-height:1;color:var(--awn2);-webkit-text-stroke:2px var(--ink)}
-
-.rankbox{background:var(--steel);border:2px solid var(--ink);border-radius:12px;padding:10px 12px;margin-top:12px;display:flex;flex-direction:column;gap:8px}
-.rankbox b{font-size:14px}
-.rankbox .row{align-items:center}
-.rankbox input{font:inherit;font-weight:700;font-size:15px;border:2px solid var(--ink);border-radius:8px;padding:6px 8px;flex:1;min-width:0;background:var(--paper)}
-.rankbox input:focus-visible{outline:3px solid var(--hi);outline-offset:1px}
-.note{font-size:12px;color:var(--muted);margin:0}
-.tabs{display:flex;gap:6px;margin-bottom:8px}
-.tabs .btn[aria-pressed="true"]{background:var(--hi)}
-.rank-list{overflow-x:auto}
-.rank-list table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
-.rank-list th{font-size:11px;color:var(--muted);text-align:left;padding:4px 6px;border-bottom:2px solid var(--ink)}
-.rank-list td{padding:6px;border-bottom:1px solid var(--steel-dk)}
-.rank-list td.num{text-align:right;font-weight:700}
-.rank-list tr.mine td{background:#fff6c4}
-.rank-list .pos{font-family:var(--display);font-size:16px;width:2.5em}
-.rank-list tr:nth-child(1) .pos{color:#c9961a}.rank-list tr:nth-child(2) .pos{color:#8a98a0}.rank-list tr:nth-child(3) .pos{color:#b06a35}
-.radio{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:center;gap:12px 16px}
-.radio .player{flex:0 1 356px;min-width:200px;height:200px;border:3px solid var(--ink);border-radius:10px;overflow:hidden;background:var(--grill)}
-.radio .player iframe{display:block;width:100%;height:100%}
-.radio .info{flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:6px}
-.radio .info b{font-family:var(--display);font-weight:400;font-size:17px}
-#toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none;width:min(92vw,420px)}
-.toast{background:var(--ink);color:var(--paper);font-weight:700;font-size:14px;padding:8px 14px;border-radius:12px;box-shadow:0 3px 0 rgba(0,0,0,.25);animation:tin .2s ease-out;text-align:center}
-.toast.good{background:var(--ok)} .toast.bad{background:var(--bad)}
-.toast.out{opacity:0;transition:opacity .35s}
-@keyframes tin{from{transform:translateY(10px);opacity:0}}
-/* ---- スマホ：上に窓口とカウンター、真ん中に1工程、下に工程タブ ---- */
-button{touch-action:manipulation}
-.menu-btn,.m-only,.tabbar{display:none}
-.menu-panel{max-width:320px;display:flex;flex-direction:column;gap:10px}
-.menu-panel .btn{min-height:48px;font-size:16px}
-.tab{all:unset;cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 2px 5px;border-radius:10px;font-size:11px;font-weight:900;line-height:1.1}
-.tab svg{width:30px;height:30px}
-.tab[aria-current="true"]{background:var(--hi);box-shadow:inset 0 0 0 2px var(--ink)}
-.tab:focus-visible{outline:3px solid var(--hi);outline-offset:1px}
-.tab .badge{position:absolute;top:1px;left:calc(50% + 8px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--ink);color:var(--paper);font-style:normal;font-size:11px;display:flex;align-items:center;justify-content:center}
-.tab .badge:empty{display:none}
-.tab .badge.alert{background:var(--bad);animation:pulse .9s ease-in-out infinite}
-@keyframes pulse{50%{transform:scale(1.2)}}
-@media (max-width:760px){
-  html,body{height:100%;overflow:hidden}
-  body{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
-  input{-webkit-user-select:text;user-select:text}
-  #app{height:100%;gap:6px;padding-block:6px 0}
-  .topbar{flex:none;flex-wrap:nowrap;gap:6px;padding:5px 6px 5px 8px;border-width:2px;border-radius:12px;box-shadow:0 3px 0 var(--ink)}
-  .logo,.tools{display:none}
-  .stats{flex:1;min-width:0;flex-wrap:nowrap;gap:4px}
-  .stat{padding:2px 7px;flex:none}
-  .stat span{font-size:9px}
-  .stat strong{font-size:15px}
-  .hearts{font-size:13px;letter-spacing:0}
-  .menu-btn{display:inline-flex;flex:none;min-height:40px}
-  .m-only{display:inline-flex}
-  .window{flex:none;border-width:2px;border-radius:12px;box-shadow:0 3px 0 var(--ink)}
-  .awning{height:12px;border-bottom-width:2px;background-size:40px 100%}
-  #customers{min-height:146px;gap:6px;padding:6px 6px 0}
-  .empty-q{font-size:13px}
-  .ticket{font-size:11px;padding:3px 5px 4px;border-radius:5px}
-  .ticket .no span:last-child{display:none}
-  .ticket li svg{width:18px;height:18px}
-  .cust-svg{width:50px;height:58px}
-  .pbar{width:58px;height:7px;margin-bottom:5px}
-  .cust .say{bottom:66px;font-size:11px;padding:2px 6px}
-  .counter{flex:none;flex-wrap:nowrap;gap:6px;padding:5px 6px 5px 8px;border-width:2px;border-radius:12px;box-shadow:0 3px 0 var(--wood-dk),0 3px 0 2px var(--ink)}
-  .counter h3,.d-only{display:none}
-  #counter{flex-wrap:nowrap;overflow-x:auto;min-height:52px;padding:4px 2px}
-  .counter .hint{font-size:11px}
-  .citem{flex:none;width:58px;height:50px}
-  .counter .btn{flex:none;font-size:12px;padding:4px 8px}
-  .kitchen{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;overflow-y:auto;overscroll-behavior:contain;padding-bottom:8px;-webkit-overflow-scrolling:touch}
-  .col{display:contents}
-  .station{border-width:2px;border-radius:12px;padding:10px;box-shadow:none}
-  .station[data-st]{display:none}
-  body[data-tab="grill"] .station[data-st="grill"],body[data-tab="burger"] .station[data-st="burger"],
-  body[data-tab="soba"] .station[data-st="soba"],body[data-tab="soup"] .station[data-st="soup"]{display:flex}
-  .station[data-st="grill"] h2,.station[data-st="burger"] h2{display:none}
-  .place-row{order:-1}
-  .place-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
-  .place-row .btn{flex-direction:column;gap:2px;padding:5px 2px;font-size:13px;white-space:nowrap}
-  .slot{min-height:96px}
-  .btn{min-height:44px;font-size:15px}
-  .btn.small{min-height:40px;font-size:13px}
-  .mini{min-height:36px;font-size:12px}
-  .station .btn{white-space:nowrap}
-  .ing-grid .btn{font-size:14px;gap:4px;padding:6px 2px}
-  .station .row .btn.small{font-size:13px;padding:5px 6px}
-  .station .chip{width:12px;height:12px}
-  .board{min-height:130px}
-  .vis{height:110px}
-  .vis svg{height:100px}
-  .station[data-st="soba"] .row .btn,.station[data-st="soup"] .row .btn{flex:1}
-  .radio{flex-direction:column;align-items:stretch}
-  .radio .player{flex:none;width:100%}
-  .tabbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;flex:none;background:var(--paper);border:2px solid var(--ink);border-bottom:0;border-radius:14px 14px 0 0;padding:4px 4px 6px}
-  #toasts{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
-  .panel{padding:16px}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1a20; --sea: #12303a; --sea-line: #1c4250; --land: #27382f; --land-edge: #4b6152;
+    --ink: #e6eee8; --ink-soft: #a5bab3; --card: #15262d; --paper: #132229; --line: #2e4651;
+    --tai: #f07d63; --tai-soft: #3d2620; --nori: #84cbb0; --nori-soft: #1b3530; --mikan: #f0b44f; --mikan-soft: #3a3020;
+    --shadow: 0 1px 0 rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
 }
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+:root[data-theme="dark"] {
+  --bg: #0d1a20; --sea: #12303a; --sea-line: #1c4250; --land: #27382f; --land-edge: #4b6152;
+  --ink: #e6eee8; --ink-soft: #a5bab3; --card: #15262d; --paper: #132229; --line: #2e4651;
+  --tai: #f07d63; --tai-soft: #3d2620; --nori: #84cbb0; --nori-soft: #1b3530; --mikan: #f0b44f; --mikan-soft: #3a3020;
+  --shadow: 0 1px 0 rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.3);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.7;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 260px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+button { font: inherit; color: inherit; }
+button:focus-visible, [tabindex]:focus-visible, input:focus-visible { outline: 3px solid var(--mikan); outline-offset: 2px; }
+.wrap { max-width: 1180px; margin: 0 auto; }
+
+/* ---------- top bar ---------- */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-block: 10px; border-bottom: 2px solid var(--ink);
+}
+.logo { font-family: var(--f-pixel); font-size: 22px; letter-spacing: .06em; line-height: 1; display: flex; align-items: baseline; gap: 8px; }
+.logo small { font-family: var(--f-body); font-size: 11px; color: var(--ink-soft); letter-spacing: .1em; }
+.status { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-variant-numeric: tabular-nums; flex: 1 1 auto; }
+.stat { display: flex; align-items: baseline; gap: 6px; }
+.stat .k { font-size: 11px; color: var(--ink-soft); letter-spacing: .08em; }
+.stat .v { font-family: var(--f-pixel); font-size: 17px; }
+.pips { display: inline-flex; gap: 3px; }
+.pip { width: 11px; height: 15px; border: 2px solid var(--ink); background: transparent; }
+.pip.on { background: var(--mikan); }
+.menu { display: flex; flex-wrap: wrap; gap: 6px; }
+.mbtn {
+  font-family: var(--f-pixel); font-size: 14px; border: 2px solid var(--ink); background: var(--card); padding: 4px 10px; cursor: pointer;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.mbtn:hover { background: var(--mikan-soft); }
+.mbtn:active { transform: translate(2px,2px); box-shadow: none; }
+
+/* ---------- stage ---------- */
+.stage { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; padding-block: 16px; }
+@media (max-width: 860px) { .stage { grid-template-columns: minmax(0,1fr); } }
+.mapbox { border: 2px solid var(--ink); background: var(--sea); position: relative; min-width: 0; }
+.mapbox svg { display: block; width: 100%; height: auto; }
+.mapcap { margin: 0; padding: 6px 10px; font-size: 12px; color: var(--ink-soft); background: var(--card); border-top: 2px solid var(--ink); }
+@media (max-width: 860px) {
+  .top { position: static; }
+  .logo { font-size: 19px; }
+  .mbtn { font-size: 13px; padding: 3px 8px; }
+  .stat .v { font-size: 15px; }
+  .win { padding: 16px 14px 10px; min-height: 96px; }
+  .txt { font-size: 15px; max-height: 26vh; }
+  .face { width: 64px; height: 64px; }
+  .win { gap: 10px; }
+  body { padding-block: 0 220px; }
+}
+.node { cursor: pointer; }
+.node circle.dot { fill: var(--card); stroke: var(--ink); stroke-width: 2.5; transition: r .2s; }
+.node:hover circle.dot { fill: var(--mikan-soft); }
+.node.here circle.dot { fill: var(--tai); }
+.node text.nm { font-family: var(--f-pixel); font-size: 15px; fill: var(--ink); paint-order: stroke; stroke: var(--land); stroke-width: 4px; }
+.node.isle text.nm { stroke: var(--sea); }
+.node text.pg { font-size: 10px; fill: var(--ink-soft); paint-order: stroke; stroke: var(--land); stroke-width: 3px; }
+.node.isle text.pg { stroke: var(--sea); }
+.node .ring { fill: none; stroke: var(--tai); stroke-width: 2; opacity: 0; }
+.node.here .ring { opacity: 1; animation: pulse 1.8s ease-out infinite; }
+@keyframes pulse { from { r: 14; opacity: .9; } to { r: 30; opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .node.here .ring { animation: none; opacity: .7; } }
+
+.panel { border: 2px solid var(--ink); background: var(--card); padding: 16px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.loc-h { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.loc-h h2 { font-family: var(--f-pixel); font-weight: 400; font-size: 26px; margin: 0; line-height: 1.1; }
+.loc-h .kana { font-size: 12px; color: var(--ink-soft); letter-spacing: .12em; }
+.loc-h .found { margin-left: auto; font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.loc-desc { margin: 0; color: var(--ink-soft); font-size: 14px; }
+.sec-label { font-size: 11px; letter-spacing: .14em; color: var(--ink-soft); margin: 0 0 6px; }
+.people { display: flex; flex-direction: column; gap: 6px; }
+.person {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; text-align: left;
+  border: 2px solid var(--line); background: var(--paper); padding: 6px 10px 6px 6px; cursor: pointer;
+}
+.person:hover { border-color: var(--ink); }
+.pinfo { display: flex; flex-direction: column; min-width: 0; line-height: 1.4; }
+.person .pn { font-weight: 700; }
+.person .pr { font-size: 12px; color: var(--ink-soft); }
+.person .hearts { color: var(--tai); letter-spacing: 1px; font-size: 14px; white-space: nowrap; }
+.mini { width: 44px; height: 44px; image-rendering: pixelated; border: 2px solid var(--ink); display: block; }
+.scene { display: block; width: 100%; height: auto; aspect-ratio: 128 / 48; image-rendering: pixelated; border: 2px solid var(--ink); margin: -2px 0 0; }
+.scene-wrap { position: relative; margin: -16px -16px 0; }
+.scene-wrap .scene { border-width: 0 0 2px; }
+.season { position: absolute; right: 8px; top: 6px; font-family: var(--f-pixel); font-size: 12px; background: rgba(20,30,36,.7); color: #f6f2e8; padding: 0 6px; }
+.pface { width: 30px; height: 30px; image-rendering: pixelated; border: 2px solid var(--ink); }
+.face { width: 108px; height: 108px; flex: none; image-rendering: pixelated; border: 3px solid var(--ink); }
+.wbody { flex: 1 1 auto; min-width: 0; }
+.avs { display: flex; flex-wrap: wrap; gap: 10px; }
+.av { border: 2px solid var(--line); background: var(--paper); padding: 6px 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: var(--ink-soft); }
+.av img { width: 72px; height: 72px; image-rendering: pixelated; border: 2px solid var(--ink); }
+.av[aria-pressed="true"] { border-color: var(--tai); box-shadow: 0 0 0 2px var(--tai); color: var(--ink); }
+.rankbox { border: 2px solid var(--mikan); background: var(--mikan-soft); padding: 12px 14px; margin-top: 14px; }
+.agree { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; }
+.agree input { margin-top: 4px; }
+tr.me td { background: var(--mikan-soft); font-weight: 700; }
+table.nw th, table.nw td { white-space: nowrap; }
+.rn { display: inline-flex; align-items: center; gap: 6px; }
+.rn img { width: 22px; height: 22px; image-rendering: pixelated; border: 1px solid var(--ink); }
+.slots { display: flex; flex-direction: column; gap: 8px; }
+.slot { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; border: 2px solid var(--line); background: var(--paper); padding: 8px 10px; }
+.slot .mini.empty { border-style: dashed; border-color: var(--line); }
+.sinfo { display: flex; flex-direction: column; min-width: 0; font-size: 13px; line-height: 1.5; }
+.sinfo span { color: var(--ink-soft); }
+.sinfo .when { font-size: 11px; }
+.sbtns { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+@media (max-width: 560px) { .slot { grid-template-columns: auto minmax(0, 1fr); } .sbtns { grid-column: 1 / -1; justify-content: flex-start; } }
+.h4 { font-family: var(--f-pixel); font-weight: 400; font-size: 17px; margin: 18px 0 6px; }
+textarea.code { width: 100%; min-height: 70px; font: 12px/1.4 ui-monospace, Consolas, monospace; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); padding: 6px 8px; margin-top: 6px; word-break: break-all; }
+.mbtn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+.friends { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+.friend { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; color: var(--ink-soft); width: 64px; text-align: center; }
+.friend img { width: 56px; height: 56px; image-rendering: pixelated; border: 2px solid var(--ink); }
+.person.new .pn::after { content: "未"; font-size: 10px; margin-left: 6px; padding: 0 4px; border: 1px solid var(--tai); color: var(--tai); vertical-align: 2px; }
+.acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.act {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px; border: 2px solid var(--ink); background: var(--card);
+  padding: 9px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); text-align: left; font-weight: 500;
+}
+.act:hover:not(:disabled) { background: var(--nori-soft); }
+.act:active:not(:disabled) { transform: translate(3px,3px); box-shadow: none; }
+.act:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+.cost { font-family: var(--f-pixel); font-size: 12px; color: var(--mikan); white-space: nowrap; }
+.moves { display: flex; flex-wrap: wrap; gap: 6px; }
+.mv { border: 1.5px solid var(--line); background: var(--paper); padding: 4px 9px; font-size: 13px; cursor: pointer; }
+.mv:hover:not(:disabled) { border-color: var(--ink); }
+.mv:disabled { opacity: .4; cursor: not-allowed; }
+.mv .cost { margin-left: 4px; }
+.endturn {
+  font-family: var(--f-pixel); font-size: 18px; padding: 12px; border: 2px solid var(--ink); background: var(--tai); color: #fff8f2;
+  cursor: pointer; box-shadow: 3px 3px 0 var(--ink); letter-spacing: .08em;
+}
+:root[data-theme="dark"] .endturn { color: #1a0d09; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .endturn { color: #1a0d09; } }
+.endturn:active { transform: translate(3px,3px); box-shadow: none; }
+
+/* ---------- dialog ---------- */
+#dlg {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); pointer-events: none;
+}
+.win {
+  pointer-events: auto; max-width: 1180px; margin: 0 auto; position: relative; background: var(--paper); color: var(--ink);
+  border: 3px solid var(--ink); outline: 2px solid var(--paper); box-shadow: 0 0 0 5px var(--ink), var(--shadow);
+  padding: 18px 20px 14px; min-height: 120px; display: flex; gap: 16px; align-items: flex-start;
+}
+.who {
+  position: absolute; top: -16px; left: 16px; font-family: var(--f-pixel); font-size: 14px; background: var(--ink); color: var(--paper);
+  padding: 2px 12px; letter-spacing: .06em;
+}
+.who:empty { display: none; }
+.txt { font-family: var(--f-pixel); font-size: 17px; line-height: 1.75; white-space: pre-line; min-height: 3.5em; max-height: 34vh; overflow-y: auto; }
+.choices { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+.ch {
+  font-family: var(--f-pixel); font-size: 15px; border: 2px solid var(--ink); background: var(--card); padding: 6px 14px; cursor: pointer;
+}
+.ch:hover { background: var(--mikan-soft); }
+.ch.next::after { content: " ▼"; animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: .2; } }
+@media (prefers-reduced-motion: reduce) { .ch.next::after { animation: none; } }
+
+/* ---------- toast ---------- */
+#toasts { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(env(safe-area-inset-top, 0px) + 70px); z-index: 30; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; pointer-events: none; }
+.toast { font-family: var(--f-pixel); font-size: 14px; background: var(--ink); color: var(--paper); padding: 4px 10px; animation: rise 2.6s ease forwards; }
+.toast.minus { background: var(--tai); color: #fff8f2; }
+@keyframes rise { 0% { transform: translateY(8px); opacity: 0; } 12% { transform: none; opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-6px); } }
+
+/* ---------- sheets ---------- */
+.sheet { position: fixed; inset: 0; z-index: 40; background: rgba(13,26,32,.55); display: flex; justify-content: center; align-items: flex-start; overflow-y: auto;
+  padding: calc(env(safe-area-inset-top, 0px) + 24px) max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 24px) max(16px, env(safe-area-inset-left, 0px)); }
+.sheet-in { background: var(--card); border: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); width: 100%; max-width: 920px; padding: 20px; position: relative; min-width: 0; }
+.sheet-in h3 { font-family: var(--f-pixel); font-weight: 400; font-size: 24px; margin: 0 0 4px; }
+.sheet-in .lead { color: var(--ink-soft); margin: 0 0 16px; font-size: 14px; }
+.close { position: absolute; top: 12px; right: 12px; font-family: var(--f-pixel); border: 2px solid var(--ink); background: var(--paper); padding: 2px 10px; cursor: pointer; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.tab { font-family: var(--f-pixel); border: 2px solid var(--ink); background: var(--paper); padding: 4px 12px; cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+
+.metrics { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.metric { border: 2px solid var(--line); background: var(--paper); padding: 10px 12px; display: grid; grid-template-columns: 1fr auto; gap: 0 8px; min-width: 0; }
+.metric .mk { font-size: 12px; color: var(--ink-soft); grid-column: 1 / -1; }
+.metric .mv2 { font-family: var(--f-pixel); font-size: 22px; font-variant-numeric: tabular-nums; }
+.metric .md { font-size: 12px; align-self: end; font-variant-numeric: tabular-nums; }
+.metric .md.up { color: var(--nori); }
+.metric .md.down { color: var(--tai); }
+.metric svg { grid-column: 1 / -1; width: 100%; height: 30px; margin-top: 4px; }
+.metric .src { grid-column: 1 / -1; font-size: 11px; color: var(--ink-soft); }
+.note { font-size: 12px; color: var(--ink-soft); margin-top: 12px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.card { border: 2px solid var(--line); background: var(--paper); padding: 10px 12px; min-width: 0; }
+.card .ct { font-weight: 700; display: flex; gap: 8px; align-items: baseline; }
+.badge { font-size: 11px; padding: 0 6px; border: 1.5px solid currentColor; white-space: nowrap; font-weight: 500; }
+.badge.charm { color: var(--nori); }
+.badge.issue { color: var(--tai); }
+.card p { margin: 4px 0 0; font-size: 13px; color: var(--ink-soft); }
+.card.unk { opacity: .55; border-style: dashed; }
+.dhead { font-family: var(--f-pixel); font-size: 18px; margin: 16px 0 8px; display: flex; gap: 8px; align-items: baseline; }
+.dhead small { font-family: var(--f-body); font-size: 12px; color: var(--ink-soft); }
+
+.plist { display: flex; flex-direction: column; gap: 10px; }
+.proj { border: 2px solid var(--line); background: var(--paper); padding: 12px 14px; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 6px 14px; }
+.proj.on { border-color: var(--nori); background: var(--nori-soft); }
+.proj.ready { border-color: var(--mikan); }
+.proj .pt { font-weight: 700; font-size: 16px; }
+.proj .pa { font-size: 12px; color: var(--ink-soft); margin-left: 6px; font-weight: 400; }
+.proj .pd { grid-column: 1; font-size: 13px; color: var(--ink-soft); margin: 0; }
+.proj .req { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 6px; font-size: 12px; }
+.req span { padding: 1px 7px; border: 1.5px solid var(--line); background: var(--card); }
+.req span.ok { border-color: var(--nori); color: var(--nori); }
+.proj .eff { grid-column: 1 / -1; font-size: 12px; color: var(--nori); }
+.proj .side { grid-column: 2; grid-row: 1 / span 2; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.go { font-family: var(--f-pixel); border: 2px solid var(--ink); background: var(--mikan); color: #1e1408; padding: 6px 12px; cursor: pointer; box-shadow: 2px 2px 0 var(--ink); white-space: nowrap; }
+.go:disabled { background: var(--paper); color: var(--ink-soft); cursor: not-allowed; box-shadow: none; opacity: .7; }
+.price { font-family: var(--f-pixel); font-size: 14px; white-space: nowrap; }
+.tagon { font-family: var(--f-pixel); font-size: 13px; color: var(--nori); }
+
+.ppl { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 10px; }
+.pp { border: 2px solid var(--line); background: var(--paper); padding: 10px 12px; display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 4px 12px; align-items: start; }
+.pp > img { width: 72px; height: 72px; image-rendering: pixelated; border: 2px solid var(--ink); grid-row: span 2; }
+.pp .hearts { color: var(--tai); }
+.pp p { margin: 2px 0 0; font-size: 13px; color: var(--ink-soft); }
+.pp .pfull { grid-column: 1 / -1; }
+
+/* ---------- title / ending ---------- */
+.title-in { max-width: 760px; }
+.bigtitle { font-family: var(--f-pixel); font-size: clamp(40px, 9vw, 72px); line-height: 1; margin: 8px 0 6px; letter-spacing: .04em; }
+.bigtitle span { color: var(--tai); }
+.sub { font-size: 15px; color: var(--ink-soft); margin: 0 0 18px; }
+.field { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 14px 0; }
+.field label { font-size: 13px; color: var(--ink-soft); }
+.field input { font: inherit; font-family: var(--f-pixel); font-size: 18px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); padding: 6px 10px; width: min(260px, 100%); }
+.row { display: flex; flex-wrap: wrap; gap: 10px; }
+.goals { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin: 16px 0; }
+.goal { border: 2px solid var(--line); padding: 10px 12px; background: var(--paper); }
+.goal b { font-family: var(--f-pixel); font-weight: 400; font-size: 16px; display: block; }
+.goal span { font-size: 13px; color: var(--ink-soft); }
+.fine { font-size: 12px; color: var(--ink-soft); margin-top: 14px; }
+.fine a { color: inherit; }
+.rank { font-family: var(--f-pixel); font-size: 84px; line-height: 1; color: var(--tai); }
+table.res { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 14px; }
+table.res th, table.res td { border-bottom: 1px solid var(--line); padding: 6px 8px; text-align: right; }
+table.res th:first-child, table.res td:first-child { text-align: left; }
+.tbl { overflow-x: auto; }
+.help h4 { font-family: var(--f-pixel); font-weight: 400; font-size: 17px; margin: 16px 0 4px; }
+.help p, .help li { font-size: 14px; }
+.help ul { padding-left: 1.2em; margin: 4px 0; }
 </style>
 </head>
 <body>
 
-<div id="app">
-  <header class="topbar">
-    <div class="logo"><b>とりおんずキッチン</b><small>しらすのキッチンカー</small></div>
-    <div class="stats">
-      <div class="stat time" id="st-time"><span>のこり時間</span><strong id="v-time">3:00</strong></div>
-      <div class="stat"><span>売上</span><strong id="v-money">0円</strong></div>
-      <div class="stat"><span>評判</span><strong class="hearts" id="v-rep"></strong></div>
-    </div>
-    <div class="tools">
-      <button class="btn small" data-a="recipe">レシピ</button>
-      <button class="btn small bgm-only" data-a="bgm" id="b-bgm" hidden>BGM ON</button>
-      <button class="btn small" data-a="sound" id="b-sound">効果音 ON</button>
-      <button class="btn small" data-a="pause">一時停止</button>
-      <button class="btn small warn" data-a="quit">閉店する</button>
-    </div>
-    <button class="btn small menu-btn" data-a="menu">メニュー</button>
+<div class="wrap">
+  <header class="top">
+    <div class="logo">つなぐ南知多<small>MINAMICHITA</small></div>
+    <div class="status" id="status"></div>
+    <nav class="menu" aria-label="メニュー">
+      <button class="mbtn" data-sheet="data">町のデータ</button>
+      <button class="mbtn" data-sheet="note">発見ノート</button>
+      <button class="mbtn" data-sheet="people">人脈</button>
+      <button class="mbtn" data-sheet="proj">企画</button>
+      <button class="mbtn" data-sheet="save">セーブ</button>
+      <button class="mbtn" data-sheet="rank" id="menuRank" hidden>ランキング</button>
+      <button class="mbtn" data-sheet="help">遊び方</button>
+      <button class="mbtn" id="btnSound" data-sound aria-pressed="true">音 ON</button>
+    </nav>
   </header>
 
-  <section class="window" aria-label="お客さん">
-    <div class="awning"></div>
-    <div id="customers"></div>
-  </section>
-
-  <section class="counter" aria-label="提供カウンター">
-    <h3>提供カウンター<small>品をえらんで→お客さんをタップ</small></h3>
-    <div id="counter"></div>
-    <button class="btn small warn" data-a="trash"><span class="d-only">選んだ品を</span>捨てる</button>
-  </section>
-
-  <section class="kitchen">
-    <div class="station" data-st="grill">
-      <h2>鉄板 <small>焼けたらタップ</small></h2>
-      <div id="grill"></div>
-      <div class="row place-row">
-        <button class="btn" data-a="place" data-v="patty"><span class="chip" style="background:#efe8d4"></span>ライスパテ</button>
-        <button class="btn" data-a="place" data-v="egg"><span class="chip" style="background:radial-gradient(circle,#f5b324 0 4px,#fff 4.5px)"></span>目玉焼き</button>
-        <button class="btn" data-a="place" data-v="soba"><span class="chip" style="background:#d39d55"></span>焼きそば</button>
-      </div>
-      <div class="tray" id="tray"></div>
-      <div class="recipe-card easy-only"><b>鉄板のコツ</b><br>ライスパテはバーガー1個に2枚。焼けた焼きそばは「しらす＋大葉」→「塩だれ・だし塩」→「器に盛る」。</div>
+  <main class="stage">
+    <div class="mapbox">
+      <svg id="map" viewBox="0 0 600 520" role="img" aria-label="南知多町の地図"></svg>
+      <p class="mapcap">知多半島の先端と、三河湾に浮かぶ2つの島。地名を押すと移動できます。</p>
     </div>
-
-    <div class="station" data-st="burger">
-      <h2>ライスバーガー台 <small>下から順に重ねる</small></h2>
-      <div id="burger-hint"></div>
-      <div class="board" id="board"></div>
-      <div class="ing-grid" id="ing"></div>
-      <div class="row">
-        <button class="btn go" data-a="wrap" style="flex:1">紙でくるむ → カウンター</button>
-        <button class="btn small warn" data-a="burger-clear">やり直す</button>
-      </div>
-      <div class="recipe-card easy-only"><b>重ねる順（下から）</b><br>ライス → レタス → たまご → トマト → しらす → ジュレ → ライス</div>
-    </div>
-
-    <div class="col">
-      <div class="station" data-st="soba" id="plate-area"></div>
-      <div class="station" data-st="soup" id="soup-area"></div>
-    </div>
-
-    <div class="station radio bgm-only" hidden>
-      <div class="player"><div id="bgm-player"></div></div>
-      <div class="info">
-        <b>車内ラジオ</b>
-        <span>BGM：みなみちたのうた♪町制60周年記念Ver</span>
-        <span class="note">動画提供：南知多町公式（YouTube）。営業開始と同時に流れ、一時停止・閉店で止まります。</span>
-      </div>
-    </div>
-  </section>
-
-  <nav class="tabbar" id="tabbar" aria-label="調理場の切り替え"></nav>
-</div>
-
-<div class="overlay" id="ov-menu" hidden>
-  <div class="panel menu-panel">
-    <h2>メニュー</h2>
-    <button class="btn" data-a="recipe">レシピを見る</button>
-    <button class="btn bgm-only" data-a="bgm" hidden>BGM ON</button>
-    <button class="btn" data-a="sound">効果音 ON</button>
-    <button class="btn" data-a="pause">一時停止</button>
-    <button class="btn warn" data-a="quit">閉店する</button>
-    <button class="btn go" data-a="menu-close">とじる</button>
-  </div>
-</div>
-
-<div class="overlay" id="ov-start">
-  <div class="panel">
-    <h1>とりおんずキッチン</h1>
-    <p>しらすのキッチンカー「とりおんずキッチン」の調理場に立って、お客さんの注文どおりに作って出そう。営業時間は3分です。</p>
-    <div class="menu3" id="menu3"></div>
-    <ul>
-      <li>窓口の<b>伝票</b>で注文を確認。</li>
-      <li>鉄板で焼く → 台で仕上げる → <b>提供カウンター</b>へ。</li>
-      <li>カウンターの品をタップしてから、<b>お客さんをタップ</b>して提供（品を選ばずにお客さんをタップすると、合う品を自動で出します）。</li>
-      <li>手順をまちがえた品を出すと評判（♥）が下がります。焦げと待たせすぎにも注意。♥が0で閉店。</li>
-    </ul>
-    <div class="choices">
-      <button class="btn go" data-a="start" data-v="easy">やさしい<small>レシピとヒント表示・お客さんが気長</small></button>
-      <button class="btn" data-a="start" data-v="normal">ふつう<small>レシピは「レシピ」ボタンで確認</small></button>
-    </div>
-    <div class="choices rank-only" hidden><button class="btn" data-a="rank-open">みんなのランキング</button></div>
-    <div class="best" id="best"></div>
-  </div>
-</div>
-
-<div class="overlay" id="ov-recipe" hidden>
-  <div class="panel">
-    <h2>レシピ</h2>
-    <div class="rcp" id="rcp"></div>
-    <div class="choices"><button class="btn go" data-a="close-recipe">調理にもどる</button></div>
-  </div>
-</div>
-
-<div class="overlay" id="ov-pause" hidden>
-  <div class="panel" style="max-width:360px;text-align:center">
-    <h2>休憩中</h2>
-    <p>鉄板の火も止めています。</p>
-    <div class="choices"><button class="btn go" data-a="pause">営業再開</button><button class="btn warn" data-a="quit-yes">ここで閉店する</button></div>
-  </div>
-</div>
-
-<div class="overlay" id="ov-quit" hidden>
-  <div class="panel" style="max-width:380px;text-align:center">
-    <h2>ここで閉店しますか？</h2>
-    <p>今までの売上で結果を出します。ランキングにも送れます。</p>
-    <div class="choices"><button class="btn warn" data-a="quit-yes">閉店して結果を見る</button><button class="btn go" data-a="quit-no">営業をつづける</button></div>
-  </div>
-</div>
-
-<div class="overlay" id="ov-result" hidden>
-  <div class="panel" id="result"></div>
-</div>
-
-<div class="overlay" id="ov-rank" hidden>
-  <div class="panel">
-    <h2>みんなのランキング</h2>
-    <div class="tabs">
-      <button class="btn small" data-a="rank-tab" data-v="normal" aria-pressed="true">ふつう</button>
-      <button class="btn small" data-a="rank-tab" data-v="easy" aria-pressed="false">やさしい</button>
-    </div>
-    <div class="rank-list" id="rank-list"></div>
-    <div class="choices"><button class="btn go" data-a="rank-close">とじる</button></div>
-  </div>
+    <section class="panel" id="panel" aria-live="polite"></section>
+  </main>
 </div>
 
 <div id="toasts" aria-live="polite"></div>
 
+<div id="dlg">
+  <div class="win" id="win">
+    <img class="face" id="face" alt="" hidden>
+    <div class="wbody">
+      <div class="who" id="who"></div>
+      <div class="txt" id="txt"></div>
+      <div class="choices" id="choices"></div>
+    </div>
+  </div>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-in" id="sheetIn" role="dialog" aria-modal="true"></div>
+</div>
+
 <script>
-const INK='#1f2d33';
-const DISH={
-  burger:{name:'しらすライスバーガー',short:'ライスバーガー',price:650},
-  soba:{name:'しらすと大葉の塩焼きそば',short:'塩焼きそば',price:700},
-  soup:{name:'しらすとたまごのスープ',short:'たまごスープ',price:350},
+"use strict";
+/* =========================================================
+   データ：地区・発見カード・人物・プロジェクト
+   実在の地名・施設・名物は 2026年10月時点の公開情報にもとづく。
+   人物と「ミナトテック」はゲーム用の架空の存在。
+   ========================================================= */
+
+const DIST = {
+  utsumi: { name: "内海", kana: "うつみ", x: 196, y: 92, island: false,
+    desc: "名鉄知多新線の終点・内海駅がある町の玄関口。弓なりの浜と、江戸時代に千石船で栄えた船主の町並みが残る。",
+    cards: ["c_chidori", "i_kaisui", "c_uchida", "c_namimakura", "i_ryokan", "c_mikan", "c_nyoirinji"],
+    people: ["nagi", "funado"],
+    idle: ["内海駅前のロータリーで、海水浴場への案内板を眺めた。", "千鳥ヶ浜を歩いた。砂がきめ細かく、足が沈む。"] },
+  yamami: { name: "山海", kana: "やまみ", x: 214, y: 186, island: false,
+    desc: "伊勢湾に面した静かな海辺の集落。国道247号沿いに温泉宿が点在し、夕日が海に沈む。",
+    cards: ["c_tsubute", "c_onsen", "i_yamamipop"],
+    people: ["urabe"],
+    idle: ["国道247号沿いを歩いた。夕方の海が金色に光っている。", "小さな漁港で、網を繕う人に会釈した。"] },
+  toyohama: { name: "豊浜", kana: "とよはま", x: 252, y: 272, island: false,
+    desc: "町内でいちばん水揚げの多い豊浜漁港の町。町役場もここにある。7月には巨大な鯛が町を練り歩く。",
+    cards: ["c_toyohamagyoko", "i_shirasu", "c_maruha", "c_taimatsuri", "c_uohiroba", "i_jisshusei"],
+    people: ["hamada", "gen", "ohashi", "rina"],
+    idle: ["豊浜漁港の岸壁で、競りの声を聞いた。", "役場の前を通ると、浜田さんが手を振っていた。"] },
+  toyooka: { name: "豊丘", kana: "とよおか", x: 382, y: 112, island: false,
+    desc: "南知多道路の豊丘ICがある丘陵地。愛知用水が通り、キャベツやたまねぎの畑が広がる農業の地区。",
+    cards: ["c_cabbage", "i_nouka", "c_hanahiroba", "c_chitagyu"],
+    people: ["yota"],
+    idle: ["畑の間の農道を歩いた。遠くに三河湾が見える。", "愛知用水の水路に沿って歩いた。"] },
+  oi: { name: "大井・片名", kana: "おおい・かたな", x: 372, y: 292, island: false,
+    desc: "三河湾側の漁師町。港に沿って細い路地が続き、家々が肩を寄せ合うように並ぶ。",
+    cards: ["c_rojimachi", "i_akiya", "c_katana"],
+    people: ["katayama"],
+    idle: ["細い路地で、猫がこちらを見ていた。", "片名漁港の堤防から、日間賀島がすぐそこに見えた。"] },
+  morozaki: { name: "師崎", kana: "もろざき", x: 302, y: 372, island: false,
+    desc: "知多半島の最先端。篠島・日間賀島へ渡る船が出る師崎港と、羽豆岬の森がある。",
+    cards: ["c_hazu", "c_asaichi", "i_jutai", "c_sakippo", "i_tsuri", "c_center"],
+    people: ["toshiko", "sato"],
+    idle: ["師崎港で、島へ向かう高速船を見送った。", "堤防にずらりと並ぶ釣り人の背中を眺めた。"] },
+  himaka: { name: "日間賀島", kana: "ひまかじま", x: 478, y: 352, island: true,
+    desc: "師崎港から船ですぐの小さな島。タコとフグで「多幸の島・福の島」を名乗り、島ぐるみで観光を育ててきた。",
+    cards: ["c_takomonument", "c_marugude", "i_tako", "c_fugu", "c_shimanori", "i_higaeri", "c_sunset"],
+    people: ["takeru"],
+    idle: ["島の路地を一周した。どこからか、タコをゆでる湯気が上がっている。", "西港の堤防で、島の子どもたちが釣りをしていた。"] },
+  shino: { name: "篠島", kana: "しのじま", x: 436, y: 448, island: true,
+    desc: "伊勢神宮とのつながりが深い島。千年以上、塩漬けの鯛を神宮へ奉納してきた。シラスの島でもある。",
+    cards: ["c_shinmei", "c_shinoshirasu", "i_shinopop", "c_taichi", "c_onbedai"],
+    people: ["mio", "miya"],
+    idle: ["坂の多い島の路地を歩いた。家と家の間から海が見える。", "港でシラス漁の船が帰ってくるのを待った。"] },
 };
-const BURGER_ORDER=['rice','lettuce','egg','tomato','shirasu','jelly','rice'];
-const LAYER={rice:'ライス',lettuce:'レタス',egg:'たまご',tomato:'トマト',shirasu:'しらす',jelly:'ジュレ'};
-const GRILL={patty:{name:'ライスパテ',cook:5,burn:13},egg:{name:'目玉焼き',cook:4,burn:11},soba:{name:'焼きそば',cook:6,burn:26}};
-const SOBA_ACTS=[['shirasu_ooba','しらす＋大葉'],['shiodare','塩だれ'],['dashishio','だし塩'],['plate','器に盛る']];
-const SHIFT=180, TRAY_MAX=4, COUNTER_MAX=5;
-const $=s=>document.querySelector(s);
-let S=null, mode='easy', last=0, audio=null, muted=false;
+
+const CARDS = {
+  /* 内海 */
+  c_chidori: { t: "charm", d: "utsumi", name: "千鳥ヶ浜", text: "約2kmにわたって弓なりに続く砂浜。東海地区最大級の内海海水浴場の中心で、夕日の名所でもある。" },
+  i_kaisui: { t: "issue", d: "utsumi", name: "海水浴客が8年で半減", text: "町の海水浴客は2016年の41.6万人から、2024年は18.7万人に。夏だけに頼る商売が難しくなっている。（データブック南知多）" },
+  c_uchida: { t: "charm", d: "utsumi", name: "内海船の船主屋敷・内田家", text: "江戸〜明治に千石船で栄えた「内海船」の船主、内田佐七家の屋敷。2017年に国の重要文化財に指定された。" },
+  c_namimakura: { t: "charm", d: "utsumi", name: "波をかたどった銘菓", text: "内海の老舗菓子店に伝わる名物。粒あんを波の形の生せんべいで包んだ、南知多みやげの定番。" },
+  i_ryokan: { t: "issue", d: "utsumi", name: "宿と飲食店が減っている", text: "町の宿泊・飲食サービス業は、2014年の287事業所から2021年は234事業所に。バブル期に建った宿の老朽化も進む。" },
+  c_mikan: { t: "charm", d: "utsumi", name: "内海のみかん狩り", text: "内海の丘には観光みかん園がいくつもあり、10月中旬〜12月中旬にみかん狩りができる。" },
+  c_nyoirinji: { t: "charm", d: "utsumi", name: "如意輪寺と知多四国", text: "知多四国霊場の第46番札所で、霊場の事務局が置かれる。知多四国の八十八か所は、日間賀島と篠島も含めて半島を巡る。" },
+  /* 山海 */
+  c_tsubute: { t: "charm", d: "yamami", name: "つぶて浦の伝説", text: "伊勢の神々が石の遠投げを競ったとき、投げた石が落ちたと伝わる浦。赤い鳥居の向こうに大きな岩が立つ。" },
+  c_onsen: { t: "charm", d: "yamami", name: "南知多温泉郷の夕日", text: "海辺を走る国道247号沿いに温泉宿が点在する。宿から伊勢湾に沈む夕日を眺められる。" },
+  i_yamamipop: { t: "issue", d: "yamami", name: "山海の人口がほぼ半分に", text: "山海地区の人口は1970年の1,635人から、2020年は884人。（国勢調査）" },
+  /* 豊浜 */
+  c_toyohamagyoko: { t: "charm", d: "toyohama", name: "豊浜漁港", text: "町内で最も水揚げの多い漁港。春はメバル、夏はマアナゴやマダコ、秋はシラス、冬はトラフグ。" },
+  i_shirasu: { t: "issue", d: "toyohama", name: "シラス不漁と加工場の苦境", text: "町のシラス水揚げは2021年の7,055トンから、2022年は3,370トンに。親魚のカタクチイワシが減り、加工業者の経営を圧迫している。" },
+  c_maruha: { t: "charm", d: "toyohama", name: "名物のジャンボエビフライ", text: "豊浜には、大きなエビフライで東海地方に名の知れた老舗の食堂がある。地元の漁港で仕入れた魚料理も評判。" },
+  c_taimatsuri: { t: "charm", d: "toyohama", name: "豊浜鯛まつり", text: "毎年7月。竹と木と布でつくった全長10m超の鯛が町を練り歩き、最後は海へ入っていく。" },
+  c_uohiroba: { t: "charm", d: "toyohama", name: "豊浜の魚市場", text: "水揚げされたばかりの魚介が並び、その場で三枚におろしてもらえる市場。えびせんべいなどの土産店も並ぶ。" },
+  i_jisshusei: { t: "issue", d: "toyohama", name: "外国人住民とつながる場", text: "町には665人の外国人住民が暮らす（インドネシア205人、ベトナム189人など）。人口の約4%だが、地域と出会う場づくりはこれから。" },
+  /* 豊丘 */
+  c_cabbage: { t: "charm", d: "toyooka", name: "冬キャベツとたまねぎの産地", text: "国の指定産地。2023年は冬キャベツ2,310トン、たまねぎ823トンを収穫した。（東海農林水産統計年報）" },
+  i_nouka: { t: "issue", d: "toyooka", name: "農家が10年で3割減", text: "町の農家は2010年の668戸から、2020年は482戸に。経営耕地も401haから310haに減った。（農林業センサス）" },
+  c_hanahiroba: { t: "charm", d: "toyooka", name: "豊丘の観光農園", text: "豊丘ICの近くには観光農園があり、いちご狩りをはじめ、季節の果物や野菜の収穫体験ができる。" },
+  c_chitagyu: { t: "charm", d: "toyooka", name: "地元育ちの牛肉", text: "町内でも約490頭の肉用牛が育てられている（2024年）。知多半島の牛肉は、ふるさと納税の返礼品にもなっている。" },
+  /* 大井・片名 */
+  c_rojimachi: { t: "charm", d: "oi", name: "漁師町の路地", text: "大井と片名にはそれぞれ漁協があり、港に沿って細い路地と古い家並みが続く。" },
+  i_akiya: { t: "issue", d: "oi", name: "空き家率が県内ワースト", text: "南知多町の空き家率は22.68%（2023年住宅・土地統計調査）。愛知県内で最も高い。" },
+  c_katana: { t: "charm", d: "oi", name: "片名漁港", text: "師崎の手前にある漁港。豊浜の食堂も、ここで水揚げされた魚を仕入れている。" },
+  /* 師崎 */
+  c_hazu: { t: "charm", d: "morozaki", name: "羽豆岬とウバメガシの森", text: "知多半島の最南端。国の天然記念物ウバメガシの森に全長800mの遊歩道があり、羽豆神社と展望台から日間賀島・篠島を一望できる。" },
+  c_asaichi: { t: "charm", d: "morozaki", name: "師崎の港の朝市", text: "朝から昼前まで開かれる港の朝市。漁師や仲買、加工屋など十数店が、師崎産の鮮魚・干物・しらすを並べる。" },
+  i_jutai: { t: "issue", d: "morozaki", name: "GW・夏の大渋滞", text: "師崎港へ向かう道は国道しかない。来訪者の60%以上が「渋滞するイメージ」を持ち、25%が渋滞を理由に訪問を見送った経験がある。" },
+  c_sakippo: { t: "charm", d: "morozaki", name: "師崎の活け魚料理", text: "生きた魚をさばいて出す、半島の先っぽ・師崎ならではの料理。2022年には地元の飲食店が協力して、地元の魚を使った新しい名物料理も開発した。" },
+  i_tsuri: { t: "issue", d: "morozaki", name: "釣り客は多いが消費が少ない", text: "師崎の釣り客は年25.8万人（2024年）。町の観光客の約3割は釣り客だが、釣って帰るだけでは町にお金が落ちにくい。" },
+  c_center: { t: "charm", d: "morozaki", name: "新・師崎港観光センター", text: "2026年1月に建て替えて開業。島への玄関口として「みなとオアシス師崎」に登録された。防災拠点の役割も担う。" },
+  /* 日間賀島 */
+  c_takomonument: { t: "charm", d: "himaka", name: "タコのにっしー・がっしー", text: "西港の「にっしー」と東港の「がっしー」。島に着いた人を迎えるタコのモニュメント。" },
+  c_marugude: { t: "charm", d: "himaka", name: "タコの丸ゆで", text: "「多幸（タコ）の島」の名物。島は1982年から島ぐるみでタコを売り出してきた。" },
+  i_tako: { t: "issue", d: "himaka", name: "タコが獲れない", text: "町のタコ類の水揚げは2021年の109トンから、2023年は49トンに。2年で半分以下になった。（データブック南知多）" },
+  c_fugu: { t: "charm", d: "himaka", name: "福（フグ）の島", text: "冬はトラフグ料理を手頃に味わえる。1995年から「福の島」として発信し、冬の客を呼び込んできた。" },
+  c_shimanori: { t: "charm", d: "himaka", name: "島育ちの海苔", text: "島の漁業者と観光協会がブランドに育てた養殖海苔。味付け海苔はふるさと納税の返礼品にもなっている。" },
+  i_higaeri: { t: "issue", d: "himaka", name: "日帰り客が多い", text: "島を訪れる人の57%は日帰り。島の宿泊者は2008年度の26.7万人から2019年度は18.1万人と、31%減った。" },
+  c_sunset: { t: "charm", d: "himaka", name: "サンセットビーチ", text: "西港近くの浜。伊勢湾に沈む夕日を眺められる。" },
+  /* 篠島 */
+  c_shinmei: { t: "charm", d: "shino", name: "神明神社と遷宮の古材", text: "771年の創建と伝わる。伊勢神宮の式年遷宮で出る古材で社殿を建て替えてきた。古材は近くの八王子社にも移される。" },
+  c_shinoshirasu: { t: "charm", d: "shino", name: "篠島のしらすとじゅうじゅうみそ", text: "「日本一」とうたわれる篠島のしらすと、島の郷土料理じゅうじゅうみそ。" },
+  i_shinopop: { t: "issue", d: "shino", name: "島の人口が6割減", text: "篠島の人口は1950年の3,785人から、2020年は1,518人に。篠島小学校の児童は75人、篠島中学校の生徒は38人（2025年）。" },
+  c_taichi: { t: "charm", d: "shino", name: "太一岬 キラキラ展望台", text: "島の南の岬。海の向こうに伊勢の方角を望む。" },
+  c_onbedai: { t: "charm", d: "shino", name: "おんべ鯛奉納祭", text: "毎年10月12日。塩漬けにした鯛を伊勢神宮へ奉納する、千年以上続く祭礼。" },
+};
+
+/* 人物（すべて架空）。lines は信頼度0〜5で変わるセリフ。reveal は「そのセリフで判明する発見カード」 */
+const NPC = {
+  hamada: { name: "浜田みのり", role: "町役場 産業振興課", d: "toyohama",
+    lines: [
+      "役場へようこそ。私はたいていここにいるので、困ったらいつでも来てください。",
+      "町の観光客の約3割は釣りのお客さんなんです。でも釣って帰るだけだと、町にお金はあまり落ちなくて。",
+      "師崎港観光センターが2026年1月に新しくなりました。島への玄関口を、町の顔にしたいんです。",
+      "南海トラフ地震では、最大9.5mの津波が想定されています。観光地だからこそ、来た人を守る仕組みが要ると思うんです。",
+      "プロジェクトがいくつも動き出したら、町全体で使えるデジタルの仕組みを考えませんか。DXって、こういうときのためにあると思うんです。",
+      "あなたが来てから、役場の空気も少し変わりました。本当ですよ。",
+    ], reveal: { 1: "i_tsuri", 2: "c_center" },
+    help: "浜田さんと一緒に、町の統計資料を読み込んで報告書をまとめた。", helpEff: { sat: 0.3 } },
+  gen: { name: "源さん", role: "豊浜の漁師・70代", d: "toyohama",
+    lines: [
+      "なんだ、協力隊か。漁師の朝は早ぇぞ。",
+      "豊浜は春はメバル、夏はアナゴにタコ、秋はシラス、冬はトラフグ。海は毎月ちがう顔をしとる。",
+      "最近は、獲れる魚が年ごとに変わってきとる。アジがやたら獲れる年もあるでな。",
+      "若い衆が減ってな。漁師を継ぐもんがおらん。外から来た人に海を教えるのも、悪くないかもしれん。",
+      "鯛まつりの鯛は、竹と木と布で毎年つくるんだ。海に入れるときは、町じゅうが燃えるぞ。",
+      "お前さんなら、船に乗せてやってもええ。",
+    ], reveal: { 1: "c_toyohamagyoko", 4: "c_taimatsuri" },
+    help: "夜明け前、源さんの網の片付けと魚の選別を手伝った。", helpEff: { fish: 0.5 } },
+  ohashi: { name: "大橋 健", role: "しらす加工場の二代目", d: "toyohama",
+    lines: [
+      "すみません、今ちょっと手が離せなくて……。",
+      "シラスはうちの町の看板です。でも2022年の水揚げは、前の年の半分以下でした。",
+      "親のカタクチイワシが減ってるみたいで。値段も上がって、加工場はどこも苦しいです。",
+      "小さすぎたり色が悪かったりする「規格外」のシラスも、味は同じなんですよ。何かに使えないかな。",
+      "リナさんたち実習生がいないと、うちの工場は回りません。",
+      "新しい商品、本気でやりましょう。",
+    ], reveal: { 1: "i_shirasu" },
+    help: "釜揚げの湯気の中で、シラスの選別と袋詰めを手伝った。", helpEff: { fish: 0.3, shop: 0.2 } },
+  rina: { name: "リナ", role: "インドネシア出身・水産加工で働く", d: "toyohama",
+    lines: [
+      "こんにちは。わたし、リナです。インドネシアから来ました。",
+      "南知多の海、ジャワの海に少し似ています。でも冬はとても寒いです。",
+      "町の人と話す機会、あまりありません。工場と寮の往復です。",
+      "わたしの国の料理、魚をたくさん使います。町の人に食べてほしいな。",
+      "インドネシアから来た人は、この町に200人くらいいます。みんなで何かやりたいです。",
+      "この町、わたしの第二のふるさとです。",
+    ], reveal: { 2: "i_jisshusei" },
+    help: "リナさんの日本語の練習に付き合い、町のゴミ出しのルールを一緒に確認した。", helpEff: { sat: 0.3 } },
+  nagi: { name: "凪（なぎ）", role: "内海の旅館の若女将", d: "utsumi",
+    lines: [
+      "いらっしゃいませ。あら、新しい協力隊の方？",
+      "うちの宿は祖父の代から。昔は夏になると、内海の浜に人があふれたそうです。",
+      "町の海水浴客は、2016年の41.6万人から2024年は18.7万人。夏だけに頼る商売は、もう難しいですね。",
+      "千鳥ヶ浜の夕日は本当にきれいなんです。泳がない人にも見てほしい。",
+      "古い船主屋敷みたいな建物に泊まれたら、素敵だと思いませんか。",
+      "一緒に、内海の夏を取り戻しましょう。",
+    ], reveal: { 2: "i_kaisui", 3: "c_chidori" },
+    help: "客室の掃除と、夕食の配膳を手伝った。", helpEff: { shop: 0.4 } },
+  funado: { name: "船戸先生", role: "元中学校教師・内海船の語り部", d: "utsumi",
+    lines: [
+      "ほう、若い人が内海に。歴史に興味はあるかね。",
+      "江戸時代、内海の廻船は「内海船」と呼ばれた。1842年ごろには200隻ほどあったそうだ。",
+      "船頭が自分で米を買い、江戸や大坂で売る。商人でもあった。内海は、海の商社の町だったんだよ。",
+      "内田佐七家の屋敷は、2017年に国の重要文化財になった。あれは内海船の富の証だ。",
+      "知多四国の札所も、この町にたくさんある。如意輪寺には霊場の事務局があってね。歩いて巡る人も、自転車で巡る人もいる。",
+      "歴史は、語る人がいなくなると消える。君が受け継いでくれ。",
+    ], reveal: { 3: "c_uchida", 4: "c_nyoirinji" },
+    help: "船戸先生の郷土資料の整理を手伝い、内海船の古文書の写真を撮った。", helpEff: { sat: 0.2, kankei: 10 } },
+  urabe: { name: "浦辺さん", role: "山海の温泉宿の主人", d: "yamami",
+    lines: [
+      "山海へようこそ。ここは静かでいいでしょう。",
+      "国道247号の海沿いには温泉宿が点々とあってね。夕日が海に沈むのが自慢だよ。",
+      "冬はお客さんが少なくてね。夏と冬の差が大きすぎる。",
+      "冬は島のフグがうまい季節だ。島で食べて、こっちの温泉に泊まってくれたらねえ。",
+      "山海の人口は、1970年の1,635人から2020年は884人。ほとんど半分だ。",
+      "冬に人が来る町にしよう。",
+    ], reveal: { 1: "c_onsen", 4: "i_yamamipop" },
+    help: "露天風呂の掃除と、薪運びを手伝った。", helpEff: { shop: 0.3 } },
+  yota: { name: "岡本陽太", role: "豊丘の若手農家", d: "toyooka",
+    lines: [
+      "どうも。畑、ぬかるんでるんで気をつけて。",
+      "豊丘は冬キャベツとたまねぎの産地です。国の指定産地なんですよ。",
+      "農家は10年で3割減りました。うちの周りも、作らなくなった畑が増えてます。",
+      "内海のみかん農家さんも、跡継ぎがいないって。木はあるのに、もったいない。",
+      "都会の人が畑に来て収穫して、そのまま地元の牛肉でバーベキュー。そんな一日、どうですか。",
+      "農業、まだまだ面白くできますよ。",
+    ], reveal: { 1: "c_cabbage", 2: "i_nouka" },
+    help: "キャベツの収穫と箱詰めを手伝った。", helpEff: { agri: 0.5 } },
+  katayama: { name: "片山のばあちゃん", role: "大井の古い家の持ち主", d: "oi",
+    lines: [
+      "あんた、どこの人だね。",
+      "この辺は漁師町だで、路地が細いんだわ。昔はどの家にも子どもがおった。",
+      "うちの隣も、その隣も空き家だ。息子は名古屋に出たきり戻らん。",
+      "家は人が住まんと、すぐ傷むでなあ。誰か使ってくれる人がおったら、貸してもええ。",
+      "パソコンで仕事する若い人？ そういう人が住んでくれるなら、うれしいがね。",
+      "あんたは、もう町の子だわ。",
+    ], reveal: { 2: "i_akiya" },
+    help: "片山さんの家の雨どいを直し、庭の草取りをした。", helpEff: { sat: 0.3 } },
+  toshiko: { name: "とし子さん", role: "師崎の朝市のおかみ", d: "morozaki",
+    lines: [
+      "朝市は朝から昼前までだよ！ 早く来な！",
+      "ここは漁師や仲買、加工屋が十何軒集まってやっとる。師崎の魚ばっかりだよ。",
+      "GWと夏は、師崎へ来る道が一本しかないもんで大渋滞。朝のうちに来てくれりゃあねえ。",
+      "釣りのお客さんは多いけど、釣ったらそのまま帰っちゃう。魚をさばいて食べられる場所があればいいのに。",
+      "師崎の魚料理は、生きとる魚をさばくで、身がプリプリなんだわ。",
+      "あんたが来ると、市がにぎやかになるね。",
+    ], reveal: { 1: "c_asaichi", 2: "i_jutai", 4: "c_sakippo" },
+    help: "朝市の設営と、干物の袋詰めを手伝った。", helpEff: { shop: 0.4, fish: 0.2 } },
+  sato: { name: "佐藤", role: "名古屋のIT企業「ミナトテック」総務", d: "morozaki", needFlag: "satoIn",
+    lines: [
+      "ミナトテックの佐藤です。社員研修に使える場所を探していまして。",
+      "うちは社員300人ほどのIT企業です。リモートワークが増えて、働く場所の考え方を見直しています。",
+      "企業版ふるさと納税にも関心があります。地域に貢献しながら、社員が学べる場がほしいんです。",
+      "海の見える場所で働けたら、社員はきっと喜びます。空き家を使えたりしませんか。",
+      "町の取り組みがデータで見えると、会社としても応援しやすいんです。",
+      "南知多は、うちの会社の「第二の拠点」です。",
+    ], reveal: {},
+    help: "佐藤さんの会社の社員を、島めぐり研修に案内した。", helpEff: { kankei: 40 } },
+  takeru: { name: "島田たける", role: "日間賀島の民宿三代目", d: "himaka",
+    lines: [
+      "ようこそ、多幸の島へ！ ……って、協力隊の人か。",
+      "島がタコで売り出したのは1982年。フグは1995年から。じいちゃんたちが島ぐるみでやったんだ。",
+      "でも最近、タコが獲れない。町の水揚げは2021年の109トンから、2023年は49トンだって。",
+      "島に来る人の半分以上が日帰り。泊まってもらえないと、民宿はきついよ。",
+      "冬のフグは、ほんとにうまい。冬の島をもっと知ってほしい。",
+      "タコを守るのも、島を守るのも、同じことなんだよな。",
+    ], reveal: { 1: "c_marugude", 2: "i_tako", 3: "i_higaeri", 4: "c_fugu" },
+    help: "民宿の布団干しと、タコの下ごしらえを手伝った。", helpEff: { shop: 0.3, fish: 0.2 } },
+  mio: { name: "みお", role: "篠島の中学生", d: "shino",
+    lines: [
+      "……こんにちは。",
+      "篠島中は、生徒が38人です。小学校も、だんだん減ってる。",
+      "高校は島の外。みんな島を出ていくのかなって思う。",
+      "島のこと、外の人に知ってほしい。太一岬から、伊勢のほうが見えるんだよ。",
+      "都会の子が、島の学校に来てくれたらいいのに。",
+      "わたし、大人になったら島に戻ってきたい。",
+    ], reveal: { 1: "i_shinopop", 3: "c_taichi" },
+    help: "みおさんたちの自由研究（島の歴史調べ）を手伝った。", helpEff: { sat: 0.3 } },
+  miya: { name: "宮さん", role: "篠島の神社の世話役", d: "shino",
+    lines: [
+      "島へようこそ。神明さんにはお参りしたかね。",
+      "篠島は伊勢神宮とのつながりが深い。おんべ鯛は、千年以上も毎年奉納しとる。",
+      "神明神社は、伊勢の式年遷宮の古材で建て替えてきた。神宮の木が、この島で生き続けとるんだ。",
+      "島の人口は1950年の3,785人から、2020年は1,518人。祭りの担い手も足らん。",
+      "伊勢とこの島を、海の道でもう一度つなげたら面白い。",
+      "あんたなら、奉納の舟に乗せてもええ。",
+    ], reveal: { 1: "c_onbedai", 2: "c_shinmei", 3: "i_shinopop" },
+    help: "神社の清掃と、祭りの準備を手伝った。", helpEff: { sat: 0.3, kankei: 10 } },
+};
+
+/* プロジェクト：発見カード＋信頼＋予算で始められる。monthly は毎月の効果、once は開始時の効果 */
+const PROJ = {
+  p_asakatsu: { name: "師崎 朝活ツアー", area: "師崎", cost: 60,
+    desc: "渋滞が始まる前の朝に来てもらう。朝市で朝ごはん、羽豆岬を歩いて、昼前の船で島へ。",
+    req: { cards: ["c_asaichi", "i_jutai", "c_hazu"], trust: { toshiko: 2 } },
+    once: { idx: 1.5, stay: 1 }, monthly: { shop: 0.3, sat: 0.2 }, flag: "asakatsu",
+    launch: [["toshiko", "朝の8時に来てくれりゃ、渋滞の前に朝市も岬も回れるがね。あたしらも早起きは得意だよ！"]] },
+  p_takotsubo: { name: "タコつぼオーナー＆放流体験", area: "日間賀島", cost: 80,
+    desc: "島の漁師とタコつぼのオーナーを募集。売上の一部で稚ダコを放流し、オーナーには獲れたタコを届ける。",
+    req: { cards: ["c_marugude", "i_tako"], trust: { takeru: 2 } },
+    once: { idx: 0.5 }, monthly: { kankei: 40, fish: 0.3, shop: 0.2 },
+    launch: [["takeru", "タコを食べに来る人に、タコを育てる側にも回ってもらうってことか。じいちゃんたちが聞いたら喜ぶよ。"]] },
+  p_mikan: { name: "みかんの木オーナー制度", area: "内海", cost: 50,
+    desc: "跡継ぎのいないみかん畑の木を、1本ずつ都市の人に年間契約で預ける。収穫は自分で、手入れは地元の農家と一緒に。",
+    req: { cards: ["c_mikan", "i_nouka"], trust: { yota: 2 } },
+    monthly: { agri: 0.5, kankei: 50, furusato: 5 },
+    launch: [["yota", "木はあるのに手が足りない。だったら、木の持ち主を外に増やせばいいんですね。冬の剪定は僕が教えます。"]] },
+  p_henro: { name: "知多四国 自転車遍路", area: "内海・山海", cost: 70,
+    desc: "如意輪寺からつぶて浦へ。札所と海辺の伝説を、レンタサイクルとスタンプでつなぐ。",
+    req: { cards: ["c_nyoirinji", "c_tsubute"], trust: { funado: 2 } },
+    once: { idx: 1 }, monthly: { kankei: 30, sat: 0.1 },
+    launch: [["funado", "歩いて巡った人の数だけ、物語が残る。案内の原稿は、私に書かせてくれ。"]] },
+  p_sunset: { name: "千鳥ヶ浜 サンセット・マルシェ", area: "内海", cost: 90,
+    desc: "泳がない人にも浜へ。夕方の千鳥ヶ浜で、地元の食と音楽の市を開く。猛暑の昼を避けた夏の新しい過ごし方。",
+    req: { cards: ["c_chidori", "i_kaisui"], trust: { nagi: 3 } },
+    once: { idx: 1.5, stay: 2 }, monthly: { shop: 0.3 }, summer: 0.6,
+    launch: [["nagi", "夕日を見て、晩ごはんを食べて、そのまま泊まっていく。そういう夏なら、うちの宿もまた満室にできます。"]] },
+  p_kominka: { name: "内海船 古民家ステイ", area: "内海", cost: 250, newInd: "古民家ステイ（宿泊の新業態）",
+    desc: "空き家になった船主町の古民家を改修し、内海船の物語を味わえる一棟貸しの宿にする。",
+    req: { cards: ["c_uchida", "i_ryokan", "i_akiya"], trust: { nagi: 2, funado: 2 } },
+    once: { stay: 4 }, monthly: { kankei: 30, shop: 0.4 }, flag: "kominka",
+    launch: [["funado", "千石船の船主が暮らした町に、また人が泊まる。内海船の続きを、君たちが書くわけだ。"], ["nagi", "予約と食事はうちの宿で受けます。古い家と旅館で、町ぐるみの宿にしましょう。"]] },
+  p_shirasu: { name: "規格外しらすの新商品", area: "豊浜", cost: 120, newInd: "規格外しらすの加工品",
+    desc: "大きさや色で売れなかったシラスを、ふりかけやオイル漬けに。ふるさと納税の返礼品としても売り出す。",
+    req: { cards: ["i_shirasu", "c_toyohamagyoko"], trust: { ohashi: 3 } },
+    monthly: { fish: 0.4, shop: 0.2, furusato: 15 },
+    launch: [["ohashi", "捨てていたものが、看板商品になるかもしれない。試作、今夜からやります！"]] },
+  p_aji: { name: "南知多アジ ブランド化", area: "豊浜", cost: 90, needFlag: "ajiBoom",
+    desc: "急に獲れるようになったアジを、豊浜の魚市場で「南知多アジ」として売り出す。干物やアジフライの名物づくり。",
+    req: { cards: ["c_uohiroba"], trust: { gen: 2 } },
+    once: { idx: 1 }, monthly: { fish: 0.5, furusato: 10 },
+    launch: [["gen", "獲れる魚が変わるなら、売り方も変えりゃええ。海に合わせるのが漁師だでな。"]] },
+  p_tabunka: { name: "みなみちた 多文化食堂", area: "豊浜", cost: 40,
+    desc: "月に一度、インドネシアやベトナムの人たちと地元の人が一緒に魚料理をつくって食べる。",
+    req: { cards: ["i_jisshusei"], trust: { rina: 3, gen: 1 } },
+    monthly: { sat: 0.5, pop: 1, kankei: 20 },
+    launch: [["rina", "わたしの国の魚料理、みんなに食べてもらえる！ 友だち、たくさん呼びます。"], ["gen", "わしも食わしてもらうか。辛いのは勘弁だぞ。"]] },
+  p_hatake: { name: "豊丘 畑の収穫体験＆牛肉BBQ", area: "豊丘", cost: 100, newInd: "農業体験ツーリズム",
+    desc: "冬キャベツの収穫と観光農園でのいちご狩り、締めは地元の牛肉のバーベキュー。畑を一日まるごと楽しむツアーにする。",
+    req: { cards: ["c_cabbage", "c_chitagyu", "c_hanahiroba"], trust: { yota: 3 } },
+    once: { idx: 0.8 }, monthly: { agri: 0.6, kankei: 20 },
+    launch: [["yota", "畑が観光地になるなんて。収穫の段取りは任せてください。"]] },
+  p_sangu: { name: "海の参宮ルート", area: "篠島", cost: 100,
+    desc: "篠島から伊勢神宮へ鯛を納めてきた千年の道を、海と陸でたどる旅に。太一岬から伊勢を望むところから始める。",
+    req: { cards: ["c_onbedai", "c_taichi", "c_shinmei"], trust: { miya: 2 } },
+    once: { idx: 1.5, stay: 2 }, monthly: { kankei: 60 },
+    launch: [["miya", "鯛を運んだ道を、人がまたたどる。神明さんも喜ばれるわ。"]] },
+  p_fuguonsen: { name: "冬のフグと温泉の島めぐり", area: "日間賀島・山海", cost: 100,
+    desc: "昼は日間賀島でフグを味わい、夜は山海の温泉宿に泊まる。夏に偏った観光を冬に広げる。",
+    req: { cards: ["c_fugu", "c_onsen", "i_higaeri"], trust: { takeru: 3, urabe: 2 } },
+    once: { stay: 5 }, monthly: { shop: 0.3 }, winter: 0.8,
+    launch: [["urabe", "島で食べて、こっちで泊まる。冬の夕日を見せてやれるぞ。"], ["takeru", "冬の島が主役になる日が来るなんてな！"]] },
+  p_tsurimeshi: { name: "釣った魚を料理する店", area: "師崎", cost: 120, newInd: "釣果を料理する飲食店",
+    desc: "釣り客が釣った魚を持ち込むと、師崎の活け魚料理の腕でさばいて出してくれる店。釣りの帰りに町でお金を使ってもらう。",
+    req: { cards: ["i_tsuri", "c_sakippo"], trust: { toshiko: 3 } },
+    once: { idx: 0.5 }, monthly: { shop: 0.6, fish: 0.2 },
+    launch: [["toshiko", "釣ったばかりの魚を目の前でさばく。それこそ師崎の料理だわ。板前は知り合いに声かけとくよ！"]] },
+  p_bousai: { name: "避難できる観光地", area: "師崎", cost: 80,
+    desc: "新しい観光センターを拠点に、観光客も一緒に参加できる津波避難訓練と、多言語の避難案内を整える。",
+    req: { cards: ["c_center"], trust: { hamada: 3 } },
+    once: { idx: 0.3 }, monthly: { sat: 0.3 }, flag: "bousai",
+    launch: [["hamada", "来た人を守れる町は、また来たくなる町だと思うんです。訓練、観光協会とも調整しますね。"]] },
+  p_ryugaku: { name: "篠島 島留学", area: "篠島", cost: 150,
+    desc: "都市部の小中学生を、1年単位で島の学校に受け入れる。島の家庭や空き家を寮にして、島の暮らしごと学んでもらう。",
+    req: { cards: ["i_shinopop", "c_shinmei"], trust: { mio: 3, miya: 3 } },
+    monthly: { pop: 3, sat: 0.4, kankei: 20 },
+    launch: [["mio", "同級生が増えるの？ 島のこと、わたしが案内する！"], ["miya", "子どもの声が増えりゃ、祭りも続けられる。"]] },
+  p_satellite: { name: "海のサテライトオフィス", area: "大井・片名", cost: 200, newInd: "サテライトオフィス・ワーケーション",
+    desc: "漁師町の空き家を改修し、企業のサテライトオフィスに。社員が海辺で働き、週末は漁や祭りに加わる。",
+    req: { cards: ["i_akiya", "c_rojimachi"], trust: { katayama: 3, sato: 2 } },
+    monthly: { kankei: 80, pop: 2, shop: 0.2 },
+    launch: [["katayama", "うちの隣に、若い人の灯りがともるんだねえ。"], ["sato", "社員の第一陣、もう手を挙げています。企業版ふるさと納税の手続きも進めますね。"]] },
+  p_digital: { name: "南知多デジタル地域通貨", area: "町全体", cost: 200, newInd: "デジタル地域通貨の運営",
+    desc: "町内の店や体験で使えるポイント。誰がどこで何に使ったかが見えるようになり、次の手を打ちやすくなる。",
+    req: { cards: [], trust: { hamada: 4, sato: 3 }, minProjects: 4 },
+    monthly: { shop: 0.5, kankei: 40, sat: 0.2 }, flag: "digital",
+    launch: [["hamada", "どの取り組みに、どれだけ人が動いたか。やっと数字で見えるようになりますね。"], ["sato", "データの基盤づくりは、うちの社員も手伝います。"]] },
+};
+
+/* =========================================================
+   登場人物のプロフィール（すべて架空）
+   ========================================================= */
+const PROFILE = {
+  hamada: { age: 34, like: "豊浜のエビフライ", profile: "豊浜生まれ。名古屋の大学を出て町役場に入った。統計と表計算が得意で、町のデータを語らせたら止まらない。",
+    again: "データはうそをつきませんけど、人の気持ちまでは映しません。だから現場が大事なんです。" },
+  gen: { age: 72, like: "朝の海と晩酌", profile: "中学を出てから60年近く豊浜の海に出ている漁師。口は悪いが面倒見がいい。鯛まつりの担ぎ手を50年続けている。",
+    again: "海は待ってくれんでな。用があるなら手短に言え。" },
+  ohashi: { age: 36, like: "しらす丼（毎日でも飽きない）", profile: "父から継いだしらす加工場を切り盛りする二代目。釜揚げの湯加減には一家言ある。新商品のアイデアをノートに書きためている。",
+    again: "今日のシラス、いい色してますよ。ちょっと食べていきます？" },
+  rina: { age: 24, like: "唐辛子みそのサンバルと、南知多の夕日", profile: "インドネシア・ジャワ島の漁村の出身。技能実習生として豊浜の水産加工場で働いて3年目。日本語は勉強中だが、笑顔で何でも伝えてしまう。",
+    again: "こんにちは！ 今日も海、きれいですね。" },
+  nagi: { age: 38, like: "千鳥ヶ浜の夕暮れ", profile: "内海の老舗旅館の若女将。東京のホテルで働いたあと、家業を継ぐために戻ってきた。着物姿で浜を歩くのが日課。",
+    again: "お茶でもいかがですか。内海の話なら、いくらでも。" },
+  funado: { age: 76, like: "古地図と羊羹", profile: "元中学校の社会科教師。退職後は内海船の古文書を読み解くのが生きがい。話し始めると長い。",
+    again: "おお、来たか。今日は廻船問屋の帳簿の話をしようか。" },
+  urabe: { age: 63, like: "冬の露天風呂", profile: "山海で三代続く温泉宿の主人。無口だが、湯と夕日のことになると急に饒舌になる。",
+    again: "湯は沸いとるよ。夕日まで、ゆっくりしていきな。" },
+  yota: { age: 27, like: "とれたてのキャベツの芯", profile: "豊丘の農家の長男。一度は名古屋で会社員になったが、畑の面白さに気づいて戻ってきた。野菜の写真をSNSで発信している。",
+    again: "今朝のキャベツ、甘いですよ。かじってみます？" },
+  katayama: { age: 84, like: "縁側での日なたぼっこ", profile: "大井で生まれ育ち、漁師の夫を見送ってからは一人暮らし。路地の家々のことは何でも知っている。",
+    again: "まあ上がってきゃあ。お茶入れるで。" },
+  toshiko: { age: 66, like: "アジの開き", profile: "師崎の朝市で干物を売って40年。声が大きく、市場の顔。常連客の顔と好みはすべて覚えている。",
+    again: "あんた、今日はいい干物あるよ！ 見てきな！" },
+  sato: { age: 35, like: "週末のアジ釣り", profile: "名古屋のIT企業「ミナトテック」総務課。社員の働き方改革を任されている。釣りが趣味で、師崎にはもともとよく来ていた。",
+    again: "社内で南知多の話をすると、みんな行きたがるんですよ。" },
+  takeru: { age: 26, like: "タコの唐揚げ", profile: "日間賀島の民宿の三代目。島の外の大学に出たが、島に戻って家業を継いだ。タコをさばく速さは島で一番。",
+    again: "よっ！ 島に来たなら、タコ食ってけよ。" },
+  mio: { age: 14, like: "太一岬から見る夕日", profile: "篠島中学校の2年生。絵を描くのが好きで、島の風景をスケッチブックに描きためている。人見知りだが、島のことになると話が止まらない。",
+    again: "……あ、また来てくれたんだ。" },
+  miya: { age: 71, like: "祭りの太鼓の音", profile: "篠島の神明神社の世話役。おんべ鯛の奉納にも長年関わってきた、島の歴史の生き字引。",
+    again: "神明さんにお参りしていきなさい。島の神さまは見とるでな。" },
+};
+const NAME2ID = Object.fromEntries(Object.entries(NPC).map(([id, p]) => [p.name, id]));
+const AVATARS = [["pa", "ジャケットの短髪"], ["pb", "ボブヘア"], ["pc", "ニット帽"]];
+
+/* =========================================================
+   キャラクターのドット絵（32×32 をその場で描く）
+   ========================================================= */
+const SKIN = { light: ["#f3d2b3", "#d9aa86"], mid: ["#e6b98f", "#c4916a"], tan: ["#cf9566", "#a97046"], brown: ["#a8704a", "#83532f"] };
+const CHAR = {
+  hamada: { skin: "light", hair: ["bob", "#4a3226", "#2f1f17"], brow: "#3a271c", cloth: "blazer", bg: "#cfe2de", blush: true },
+  gen: { skin: "tan", hair: ["receding", "#dcdcd6", "#b5b5ae"], brow: "#e8e8e2", cloth: "work", bg: "#d4e2ec", acc: ["stubble", "wrinkle", "hachimaki"] },
+  ohashi: { skin: "mid", hair: ["whitecap", "#2a2a2a", "#111111"], brow: "#2a2a2a", cloth: "whitecoat", bg: "#e1edf2" },
+  rina: { skin: "brown", hair: ["hijab", "#3f9f97", "#2c7c75"], brow: "#2b1d14", cloth: "cardigan", bg: "#f3e2bf", blush: true },
+  nagi: { skin: "light", hair: ["updo", "#221d27", "#100d14"], brow: "#221d27", cloth: "kimono", bg: "#f1dbe0", blush: true, lip: "#c4505a" },
+  funado: { skin: "light", hair: ["part", "#efefea", "#c9c9c2"], brow: "#d2d2cb", cloth: "cardigan2", bg: "#e9e1cf", acc: ["wrinkle", "glasses"] },
+  urabe: { skin: "mid", hair: ["baldside", "#9e9e98", "#7a7a72"], brow: "#7a7a72", cloth: "samue", bg: "#dce8da", acc: ["wrinkle", "mustache", "towel"] },
+  yota: { skin: "tan", hair: ["short", "#1f1a17", "#3a302a"], brow: "#1f1a17", cloth: "farm", bg: "#e3eecb", acc: ["strawhat"] },
+  katayama: { skin: "light", hair: ["bun", "#d4d4d2", "#ababa8"], brow: "#c2c2be", cloth: "kappogi", bg: "#efe5d8", blush: true, acc: ["wrinkle", "wrinkle2"] },
+  toshiko: { skin: "mid", hair: ["perm", "#4a2c22", "#6b4434"], brow: "#3a2219", cloth: "apron", bg: "#f6e0ca", blush: true, acc: ["bandana"] },
+  sato: { skin: "light", hair: ["part", "#2b2522", "#4a403a"], brow: "#2b2522", cloth: "suit", bg: "#dce2ec" },
+  takeru: { skin: "tan", hair: ["short", "#2a1d14", "#45332a"], brow: "#2a1d14", cloth: "tako", bg: "#f5dad0", acc: ["cap"] },
+  mio: { skin: "light", hair: ["pony", "#1d1a22", "#3a3542"], brow: "#1d1a22", cloth: "sailor", bg: "#d9e5f3", blush: true },
+  miya: { skin: "mid", hair: ["short", "#ebebe5", "#c4c4bd"], brow: "#dadad2", cloth: "happi", bg: "#e6e0d1", acc: ["wrinkle", "tenugui"] },
+  pa: { skin: "light", hair: ["short", "#3a2a20", "#5a4434"], brow: "#3a2a20", cloth: "jacket", bg: "#d6e6ef" },
+  pb: { skin: "light", hair: ["bob", "#5a3a28", "#3c2518"], brow: "#4a2f20", cloth: "jacketG", bg: "#e0eeda", blush: true },
+  pc: { skin: "mid", hair: ["long", "#2a201b", "#17110e"], brow: "#2a201b", cloth: "jacketO", bg: "#f2e2cd", acc: ["beanie"] },
+};
+
+function drawCloth(R, type, sk) {
+  const body = (c) => { R(6, 25, 20, 7, c); R(4, 27, 24, 5, c); };
+  const vneck = (c, line) => { for (let i = 0; i < 5; i++) { R(12 + i, 24 + i, 2, 1, c); R(18 - i, 24 + i, 2, 1, c); if (line) { R(11 + i, 24 + i, 1, 1, line); R(20 - i, 24 + i, 1, 1, line); } } };
+  switch (type) {
+    case "blazer": body("#2e4060"); R(14, 25, 4, 4, "#f4f4f4"); R(13, 25, 1, 3, "#3d5278"); R(18, 25, 1, 3, "#3d5278");
+      R(12, 25, 1, 5, "#c0392b"); R(19, 25, 1, 5, "#c0392b"); R(13, 29, 6, 3, "#f4f4f4"); R(14, 30, 4, 1, "#3a7bd5"); break;
+    case "work": body("#3e6283"); R(14, 25, 4, 2, sk); R(12, 25, 2, 2, "#5a80a3"); R(18, 25, 2, 2, "#5a80a3"); R(15, 27, 2, 5, "#2f4c66"); break;
+    case "whitecoat": body("#eef1f4"); R(14, 25, 4, 2, "#dfe5ea"); R(9, 28, 14, 4, "#3a78c2"); R(9, 28, 14, 1, "#2d5f9c"); break;
+    case "cardigan": body("#d9a441"); R(13, 27, 6, 5, "#f7f2e8"); R(12, 27, 1, 5, "#b88a33"); R(19, 27, 1, 5, "#b88a33"); break;
+    case "kimono": body("#2f3f75"); vneck("#f6f2ea", "#e7a0b0"); R(9, 30, 14, 2, "#d9b24a"); R(15, 30, 2, 2, "#b8433a"); break;
+    case "cardigan2": body("#7b5b3c"); R(13, 25, 2, 2, "#f4f4f0"); R(17, 25, 2, 2, "#f4f4f0"); R(15, 25, 2, 7, "#e9e2d0"); R(14, 28, 1, 1, "#4a3420"); R(14, 30, 1, 1, "#4a3420"); break;
+    case "samue": body("#3d5c47"); vneck("#2b4233"); R(14, 25, 4, 2, sk); break;
+    case "farm": body("#5c7f3c"); R(15, 27, 2, 5, "#486630"); R(11, 24, 10, 2, "#f4f4f0"); R(11, 26, 2, 3, "#f4f4f0"); R(11, 25, 10, 1, "#c94a3a"); break;
+    case "kappogi": body("#f2efe7"); R(4, 28, 3, 4, "#7a5a8c"); R(25, 28, 3, 4, "#7a5a8c"); R(14, 25, 4, 2, "#7a5a8c"); R(15, 29, 2, 1, "#d9d4c8"); break;
+    case "apron": body("#d8584a"); R(9, 27, 14, 5, "#2f5f8f"); R(10, 25, 1, 2, "#2f5f8f"); R(21, 25, 1, 2, "#2f5f8f"); R(13, 29, 6, 2, "#3d74ab"); break;
+    case "suit": body("#5b6472"); R(13, 25, 6, 5, "#f4f4f4"); R(15, 26, 2, 6, "#2a5ab0"); R(15, 25, 2, 1, "#1f4a94"); R(12, 25, 1, 7, "#4a5260"); R(19, 25, 1, 7, "#4a5260"); break;
+    case "tako": body("#f4f4f0"); R(4, 27, 6, 5, "#c63c2c"); R(22, 27, 6, 5, "#c63c2c"); R(9, 25, 3, 7, "#c63c2c"); R(20, 25, 3, 7, "#c63c2c");
+      R(14, 27, 4, 3, "#e8708a"); R(13, 30, 1, 2, "#e8708a"); R(15, 30, 1, 2, "#e8708a"); R(17, 30, 1, 2, "#e8708a"); R(18, 30, 1, 2, "#e8708a"); break;
+    case "sailor": body("#26335c"); R(8, 26, 16, 1, "#f4f4f4"); R(6, 27, 3, 1, "#f4f4f4"); R(23, 27, 3, 1, "#f4f4f4"); R(14, 25, 4, 1, sk); R(14, 26, 4, 3, "#d23a3a"); R(15, 29, 2, 2, "#d23a3a"); break;
+    case "happi": body("#f2f0ea"); R(12, 24, 2, 8, "#2d4a8a"); R(18, 24, 2, 8, "#2d4a8a"); R(14, 25, 4, 2, sk); R(5, 29, 4, 1, "#2d4a8a"); R(23, 29, 4, 1, "#2d4a8a"); break;
+    case "jacket": body("#2a6f8f"); R(14, 25, 4, 3, "#f4f4f4"); R(15, 26, 2, 6, "#1f566f"); R(19, 28, 3, 2, "#f0c040"); break;
+    case "jacketG": body("#3f7a52"); R(14, 25, 4, 3, "#f4f4f4"); R(15, 26, 2, 6, "#2f5f3f"); R(19, 28, 3, 2, "#f0c040"); break;
+    case "jacketO": body("#c8702a"); R(14, 25, 4, 3, "#f4f4f4"); R(15, 26, 2, 6, "#a35a1f"); R(19, 28, 3, 2, "#2a6f8f"); break;
+  }
+}
+function drawHair(R, hs, h, hd) {
+  switch (hs) {
+    case "short": R(9, 5, 14, 4, h); R(8, 7, 16, 3, h); R(8, 10, 2, 4, h); R(22, 10, 2, 4, h);
+      R(10, 9, 12, 1, h); R(10, 10, 3, 1, h); R(15, 10, 4, 1, h); R(20, 10, 2, 1, h); R(11, 6, 6, 1, hd); break;
+    case "part": R(9, 5, 14, 4, h); R(8, 7, 16, 3, h); R(8, 10, 2, 4, h); R(22, 10, 2, 4, h); R(10, 9, 9, 2, h); R(19, 9, 3, 1, h); R(18, 5, 1, 4, hd); break;
+    case "bob": case "long":
+      R(9, 4, 14, 5, h); R(7, 7, 18, 4, h); R(7, 11, 3, 11, h); R(22, 11, 3, 11, h); R(10, 10, 5, 2, h); R(16, 10, 6, 1, h); R(10, 5, 5, 1, hd);
+      if (hs === "long") { R(7, 22, 3, 5, h); R(22, 22, 3, 5, h); } break;
+    case "pony": R(9, 5, 14, 4, h); R(8, 7, 16, 4, h); R(8, 11, 2, 6, h); R(22, 11, 2, 5, h); R(10, 10, 6, 1, h); R(17, 10, 4, 1, h); R(11, 6, 5, 1, hd); break;
+    case "updo": R(9, 5, 14, 4, h); R(8, 7, 16, 3, h); R(8, 10, 2, 6, h); R(22, 10, 2, 6, h); R(10, 9, 5, 2, h); R(17, 9, 5, 2, h);
+      R(12, 1, 8, 5, h); R(13, 2, 3, 1, hd); R(19, 2, 5, 1, "#d9b24a"); R(23, 1, 2, 2, "#e98a9a"); break;
+    case "bun": R(9, 6, 14, 3, h); R(8, 8, 16, 3, h); R(8, 11, 2, 4, h); R(22, 11, 2, 4, h); R(13, 3, 6, 3, h); R(14, 3, 4, 1, hd); break;
+    case "perm": R(8, 4, 16, 6, h); R(7, 6, 18, 6, h); R(7, 12, 3, 6, h); R(22, 12, 3, 6, h); R(10, 10, 4, 1, h); R(16, 10, 5, 1, h);
+      [[9, 5], [12, 4], [15, 5], [18, 4], [21, 5], [8, 8], [23, 8], [8, 13], [23, 13], [8, 16], [23, 16]].forEach(([x, y]) => R(x, y, 1, 1, hd)); break;
+    case "receding": R(8, 10, 2, 6, h); R(22, 10, 2, 6, h); R(9, 8, 2, 2, h); R(21, 8, 2, 2, h); break;
+    case "baldside": R(8, 11, 2, 5, h); R(22, 11, 2, 5, h); R(9, 10, 1, 1, h); R(22, 10, 1, 1, h); R(13, 8, 3, 1, "rgba(255,255,255,.4)"); break;
+    case "whitecap": R(8, 11, 2, 3, h); R(22, 11, 2, 3, h); R(8, 3, 16, 8, "#f4f6f8"); R(7, 6, 18, 5, "#f4f6f8"); R(7, 10, 18, 1, "#cfd6dd"); R(10, 4, 4, 1, "#ffffff"); break;
+    case "hijab": R(9, 5, 14, 5, h); R(8, 8, 16, 3, h); R(8, 11, 2, 12, h); R(22, 11, 2, 12, h); R(9, 9, 14, 1, hd);
+      R(10, 22, 12, 4, h); R(8, 24, 16, 2, h); R(11, 24, 10, 1, hd); break;
+  }
+}
+function drawAcc(R, a) {
+  if (a.includes("hachimaki")) { R(8, 9, 16, 2, "#f4f4f0"); R(8, 10, 16, 1, "#d6d6cc"); [10, 13, 16, 19].forEach((x) => R(x, 9, 1, 1, "#d6d6cc")); R(5, 8, 3, 3, "#f4f4f0"); R(4, 11, 2, 3, "#f4f4f0"); }
+  if (a.includes("glasses")) { const c = "#3a3530"; [11, 17].forEach((x) => { R(x + 1, 14, 2, 2, "#e4eef1"); R(x + 1, 15, 2, 1, "#22201f"); R(x, 13, 4, 1, c); R(x, 16, 4, 1, c); R(x, 14, 1, 2, c); R(x + 3, 14, 1, 2, c); }); R(15, 14, 2, 1, c); }
+  if (a.includes("strawhat")) { R(10, 2, 12, 6, "#e2c06a"); R(11, 3, 10, 1, "#f0d88a"); R(10, 6, 12, 1, "#b8433a"); R(3, 7, 26, 2, "#e2c06a"); R(3, 8, 26, 1, "#c7a253"); }
+  if (a.includes("cap")) { R(9, 4, 14, 5, "#d8433a"); R(8, 7, 16, 3, "#d8433a"); R(15, 5, 2, 2, "#f4f4f0"); R(8, 9, 18, 2, "#a8322b"); }
+  if (a.includes("tenugui")) { R(8, 9, 16, 2, "#2d4a8a"); [[9, 9], [11, 10], [13, 9], [15, 10], [17, 9], [19, 10], [21, 9], [23, 10]].forEach(([x, y]) => R(x, y, 1, 1, "#f4f4f0")); R(22, 7, 3, 2, "#2d4a8a"); }
+  if (a.includes("bandana")) { R(8, 4, 16, 4, "#c83a3a"); R(9, 3, 14, 1, "#c83a3a"); [[10, 5], [13, 6], [16, 4], [19, 6], [22, 5]].forEach(([x, y]) => R(x, y, 1, 1, "#f4f4f0")); R(24, 6, 3, 2, "#c83a3a"); }
+  if (a.includes("beanie")) { R(9, 3, 14, 6, "#e0812f"); R(8, 6, 16, 4, "#e0812f"); R(8, 9, 16, 1, "#b5641f"); [10, 13, 16, 19].forEach((x) => R(x, 4, 1, 4, "#c76e24")); R(14, 1, 4, 2, "#f4f4f0"); }
+  if (a.includes("towel")) { R(19, 24, 7, 3, "#f4f4f0"); R(19, 25, 7, 1, "#4a7ab0"); }
+}
+const faceCache = {};
+// eyes: open | blink、mouth: flat | smile | open、sil: 未対面の影
+function faceURL(id, mouth = "flat", eyes = "open", sil = false) {
+  const key = [id, mouth, eyes, sil].join("|");
+  if (faceCache[key]) return faceCache[key];
+  const sp = CHAR[id];
+  const c = document.createElement("canvas"); c.width = c.height = 32;
+  const g = c.getContext("2d");
+  const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  const [sk, sks] = SKIN[sp.skin];
+  const [hs, h, hd] = sp.hair;
+  const acc = sp.acc || [];
+  if (hs === "long") R(7, 10, 18, 17, hd);
+  if (hs === "hijab") { R(6, 5, 20, 21, h); R(5, 9, 22, 13, h); }
+  if (hs === "pony") { R(23, 7, 4, 12, h); R(24, 19, 2, 3, h); R(23, 8, 4, 1, "#d23a3a"); }
+  drawCloth(R, sp.cloth, sk);
+  if (hs !== "hijab") { R(13, 21, 6, 5, sk); R(13, 24, 6, 1, sks); }
+  R(10, 7, 12, 15, sk); R(9, 9, 14, 11, sk); R(11, 22, 10, 1, sk);
+  R(8, 13, 1, 4, sk); R(23, 13, 1, 4, sk); R(8, 15, 1, 1, sks); R(23, 15, 1, 1, sks);
+  R(11, 12, 3, 1, sp.brow); R(18, 12, 3, 1, sp.brow);
+  const eye = "#22201f";
+  if (eyes === "blink") { R(12, 15, 2, 1, eye); R(18, 15, 2, 1, eye); }
+  else { R(12, 14, 2, 2, eye); R(18, 14, 2, 2, eye); R(12, 14, 1, 1, "#ffffff"); R(18, 14, 1, 1, "#ffffff"); }
+  R(15, 17, 2, 1, sks);
+  if (sp.blush) { R(10, 17, 2, 1, "#f2a3a0"); R(20, 17, 2, 1, "#f2a3a0"); }
+  if (acc.includes("wrinkle")) { R(12, 16, 2, 1, sks); R(18, 16, 2, 1, sks); R(11, 18, 1, 1, sks); R(20, 18, 1, 1, sks); }
+  if (acc.includes("wrinkle2")) { R(13, 21, 1, 1, sks); R(18, 21, 1, 1, sks); R(13, 10, 6, 1, sks); }
+  if (acc.includes("stubble")) [[12, 20], [14, 21], [16, 21], [18, 20], [13, 22], [17, 22], [19, 21], [11, 19], [20, 19]].forEach(([x, y]) => R(x, y, 1, 1, "#7d6a58"));
+  const lip = sp.lip || "#8a3a34";
+  if (mouth === "open") { R(14, 19, 4, 2, "#5a1f22"); R(15, 20, 2, 1, "#d0606a"); }
+  else if (mouth === "smile") { R(14, 20, 4, 1, lip); R(13, 19, 1, 1, lip); R(18, 19, 1, 1, lip); }
+  else R(14, 19, 4, 1, lip);
+  if (acc.includes("mustache")) { R(13, 18, 6, 1, "#9e9e98"); R(12, 19, 1, 1, "#9e9e98"); R(19, 19, 1, 1, "#9e9e98"); }
+  drawHair(R, hs, h, hd);
+  drawAcc(R, acc);
+  if (sil) { g.globalCompositeOperation = "source-in"; g.fillStyle = "#3b4d55"; g.fillRect(0, 0, 32, 32); }
+  return (faceCache[key] = c.toDataURL());
+}
+const charBg = (id) => (CHAR[id] ? CHAR[id].bg : "#dde6e6");
+const baseMouth = (id) => (NPC[id] ? (trust(id) >= 2 ? "smile" : "flat") : "smile");
+
+/* =========================================================
+   地区の風景（128×48 のドット絵。季節で空の色が変わる）
+   ========================================================= */
+function seasonOf(mi) { return mi <= 1 || mi === 11 ? "spring" : mi <= 4 ? "summer" : mi <= 7 ? "autumn" : "winter"; }
+function paintScene(cv, id, mi) {
+  cv.width = 128; cv.height = 48;
+  const g = cv.getContext("2d");
+  const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  const season = seasonOf(mi);
+  const SKY = { spring: ["#a9d6ec", "#c7e4f1", "#ecdfe7"], summer: ["#5fb2e8", "#8ccaf0", "#c4e6f8"], autumn: ["#e39a66", "#efbd8b", "#f6dab4"], winter: ["#8ea6ba", "#b2c4d2", "#d6e0e8"] }[season];
+  R(0, 0, 128, 10, SKY[0]); R(0, 10, 128, 10, SKY[1]); R(0, 20, 128, 10, SKY[2]);
+  if (season === "autumn") { R(100, 19, 9, 6, "#f8d27a"); R(101, 18, 7, 1, "#f8d27a"); }
+  else { R(106, 4, 8, 8, season === "winter" ? "#f4f2e6" : "#fff2a8"); R(105, 6, 10, 4, season === "winter" ? "#f4f2e6" : "#fff2a8"); }
+  R(14, 6, 16, 3, "rgba(255,255,255,.8)"); R(18, 4, 8, 2, "rgba(255,255,255,.8)"); R(60, 10, 12, 2, "rgba(255,255,255,.7)");
+  R(0, 30, 128, 18, "#3a86b0"); R(0, 30, 128, 1, "#a6d4e8");
+  for (let y = 33; y < 48; y += 3) for (let x = (y * 13) % 17; x < 128; x += 17) R(x, y, 4, 1, "#62a8cf");
+  R(0, 27, 26, 3, "#7f9aa8"); R(92, 28, 36, 2, "#7f9aa8");
+  const roof = (x, y, w, c) => { R(x, y, w, 2, c); R(x + 1, y - 1, w - 2, 1, c); };
+  const torii = (x, y, h) => { R(x, y, 1, h, "#c8402e"); R(x + 7, y, 1, h, "#c8402e"); R(x - 2, y - 1, 12, 1, "#c8402e"); R(x - 1, y - 2, 10, 1, "#a8321f"); R(x, y + 1, 8, 1, "#c8402e"); };
+  const boat = (x, y, flag) => { R(x, y, 22, 3, "#f4f4f0"); R(x + 2, y + 3, 18, 1, "#c8402e"); R(x + 10, y - 4, 7, 4, "#e6e6de"); R(x + 4, y - 9, 1, 9, "#555"); if (flag) R(x + 5, y - 9, 4, 2, flag); };
+  switch (id) {
+    case "utsumi":
+      R(0, 37, 128, 11, "#ecd9a8"); R(0, 35, 70, 2, "#ecd9a8"); R(0, 36, 128, 1, "#ffffff");
+      R(4, 22, 20, 10, "#ddd4c0"); roof(3, 20, 22, "#7a4a3a"); R(8, 25, 4, 3, "#8fb6c9"); R(16, 25, 4, 3, "#8fb6c9");
+      if (season === "summer") { [[40, "#e05a4a"], [64, "#3a7bd5"], [88, "#f0b030"]].forEach(([x, c]) => { R(x + 4, 31, 1, 7, "#555"); R(x, 29, 9, 2, c); R(x + 2, 28, 5, 1, c); }); }
+      else { R(60, 34, 2, 2, "#555"); R(64, 35, 2, 1, "#555"); }
+      break;
+    case "yamami":
+      R(0, 31, 52, 7, "#8c8a6a"); R(6, 21, 28, 11, "#cbb99a"); roof(4, 19, 32, "#4a5a6a"); R(10, 24, 5, 3, "#f0d890"); R(22, 24, 5, 3, "#f0d890");
+      [[12, 13], [17, 11], [22, 14]].forEach(([x, y]) => { R(x, y, 1, 4, "rgba(255,255,255,.8)"); R(x + 1, y - 2, 1, 3, "rgba(255,255,255,.6)"); });
+      R(80, 25, 12, 12, "#7d7468"); R(82, 22, 7, 3, "#7d7468"); R(83, 23, 3, 1, "#968c7e"); torii(60, 24, 9);
+      break;
+    case "toyohama":
+      R(0, 33, 76, 4, "#9a9a92"); R(0, 37, 76, 1, "#7a7a72"); R(88, 19, 34, 13, "#c9c9c0"); roof(86, 17, 38, "#5a6a78"); R(96, 24, 8, 8, "#8a8a82");
+      boat(16, 39, "#d8433a"); boat(50, 41, "#3a7bd5");
+      if (mi === 3) { R(56, 22, 22, 7, "#e05a4a"); R(53, 24, 4, 3, "#e05a4a"); R(78, 21, 4, 9, "#e05a4a"); R(59, 24, 1, 1, "#222"); R(62, 27, 12, 1, "#f2a090"); }
+      break;
+    case "toyooka":
+      R(0, 24, 128, 24, "#86b956"); R(0, 22, 46, 3, "#76a94a"); R(70, 23, 58, 2, "#76a94a");
+      for (let y = 30; y < 48; y += 3) for (let x = (y % 2) * 2; x < 128; x += 5) R(x, y, 2, 2, season === "summer" ? "#4f8f2f" : "#5f9a3a");
+      R(90, 15, 22, 10, "#e2d6bc"); roof(88, 13, 26, "#5a4a3a"); R(96, 19, 4, 6, "#7a6248"); R(104, 18, 4, 3, "#8fb6c9");
+      break;
+    case "oi":
+      R(0, 32, 128, 5, "#a8a090");
+      for (let i = 0; i < 8; i++) { const x = i * 16; R(x + 1, 20, 14, 12, i % 3 ? "#d8cfbf" : "#cfc3ae"); roof(x, 18, 16, i % 2 ? "#4a5868" : "#5a4a40"); R(x + 6, 26, 3, 6, "#6a5a48"); R(x + 2, 22, 3, 3, "#8fb6c9"); }
+      boat(44, 42, null);
+      break;
+    case "morozaki":
+      R(0, 14, 48, 20, "#2f6a3e"); R(4, 10, 36, 4, "#2f6a3e"); R(10, 8, 22, 2, "#2f6a3e");
+      [[8, 12], [16, 9], [26, 11], [36, 15], [12, 20], [30, 22], [40, 26]].forEach(([x, y]) => R(x, y, 3, 2, "#3f8a52"));
+      R(20, 16, 6, 3, "#8a3a2a"); R(0, 33, 66, 4, "#9a9a92");
+      R(68, 21, 32, 11, "#ece8de"); roof(66, 19, 36, "#3a6a8a"); [72, 80, 88].forEach((x) => R(x, 24, 5, 3, "#8fb6c9"));
+      R(100, 37, 24, 4, "#f4f4f0"); R(104, 34, 12, 3, "#e8e8e0"); R(100, 40, 24, 1, "#2a6fb0"); R(110, 27, 18, 3, "#5f8a6a");
+      break;
+    case "himaka":
+      R(6, 26, 116, 8, "#d9c896"); R(30, 18, 64, 9, "#6f9a5a"); R(44, 15, 34, 4, "#6f9a5a");
+      [[50, 22], [62, 21], [74, 23], [86, 22], [100, 24]].forEach(([x, y]) => { R(x, y, 7, 5, "#efe6d4"); R(x - 1, y - 1, 9, 2, "#4a5868"); });
+      R(16, 15, 9, 8, "#e0604a"); R(17, 14, 7, 1, "#e0604a"); R(18, 18, 1, 2, "#222"); R(22, 18, 1, 2, "#222");
+      [[14, 2], [17, 1], [20, 1], [23, 1], [25, 2]].forEach(([x, w]) => R(x, 23, w, 7, "#e0604a"));
+      break;
+    case "shino":
+      R(0, 22, 128, 12, "#5f8a5a"); R(20, 16, 70, 7, "#6f9a62"); R(36, 12, 36, 4, "#6f9a62");
+      R(60, 12, 20, 3, "#5a4030"); R(61, 11, 18, 1, "#4a3428"); R(62, 15, 16, 7, "#b08a5a"); R(68, 17, 4, 5, "#6a4a30");
+      torii(46, 19, 10);
+      boat(92, 39, "#f0b030");
+      break;
+  }
+}
+const SAVE_KEY = "tsunagu-minamichita-v1";
+const SEASON = [1.0, 1.2, 0.8, 1.3, 1.9, 0.8, 0.9, 0.8, 0.8, 0.8, 0.7, 1.0]; // 4月〜3月
+const TOURIST_BASE = 1792000;   // 2024年の観光客（データブック南知多）
+const LV_EXP = [0, 25, 60, 110, 170, 240, 320, 410, 510];
+const TOTAL_TURNS = 36;
+const BUDGET_YEAR = 300;        // 毎年4月に配られる活動予算（万円）
+const START = { pop: 15150, kankei: 3000, idx: 1, stay: 0.20, fish: 100, agri: 100, shop: 100, sat: 60, newInd: 0 };
+
+let S = null;
+let busy = false;
+
+function newState(name) {
+  return { v: 1, name, turn: 0, ap: 5, apMax: 5, loc: "utsumi", lv: 1, exp: 0,
+    skills: { plan: 0, post: 0, nego: 0, stamina: 0 }, budget: BUDGET_YEAR,
+    m: { ...START }, found: {}, trust: {}, met: {}, talked: {}, helped: {}, posted: {},
+    projects: {}, flags: {}, used: {}, hist: [], posts: 0, over: false, started: false, runId: newId() };
+}
+
+function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }
+function load() { try { const r = localStorage.getItem(SAVE_KEY); return r ? JSON.parse(r) : null; } catch (e) { return null; } }
+function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
+
+/* 手動セーブ（3枠）・セーブコード・これまでの記録。すべてこのブラウザの中だけに残る */
+const SLOT_KEYS = ["tsunagu-slot-1", "tsunagu-slot-2", "tsunagu-slot-3"];
+const REC_KEY = "tsunagu-records";
+function readKey(k) { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : null; } catch (e) { return null; } }
+function writeKey(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+function validState(st) { return !!(st && typeof st.turn === "number" && st.m && typeof st.m.pop === "number" && st.name && st.found && st.trust); }
+const encodeSave = (st) => "TSUNAGU1:" + btoa(unescape(encodeURIComponent(JSON.stringify(st))));
+function decodeSave(code) {
+  const t = String(code).replace(/\s+/g, "");
+  if (!t.startsWith("TSUNAGU1:")) return null;
+  try { const st = JSON.parse(decodeURIComponent(escape(atob(t.slice(9))))); return validState(st) ? st : null; } catch (e) { return null; }
+}
+const realDate = (iso) => { try { const d = new Date(iso); return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; } catch (e) { return ""; } };
+function addRecord() {
+  const { total } = score();
+  const rank = total >= 80 ? "S" : total >= 60 ? "A" : total >= 40 ? "B" : total >= 20 ? "C" : "D";
+  const recs = readKey(REC_KEY) || [];
+  recs.push({ at: new Date().toISOString(), name: S.name, avatar: S.avatar || "pa", total, rank, kankei: Math.round(S.m.kankei), newInd: S.m.newInd, projects: Object.keys(S.projects).length });
+  recs.sort((a, b) => b.total - a.total);
+  writeKey(REC_KEY, recs.slice(0, 20));
+}
 
 /* みんなのランキング（Googleスプレッドシートに送る）。
-   受信先の URL は公開版（GitHub Pages）を作るときだけ window.KITCHEN_RANKING_URL に入れる。
+   受信先の URL は公開版（GitHub Pages）を作るときだけ window.TSUNAGU_RANKING_URL に入れる。
    claude.ai のアーティファクトでは外部へ送れないため、URL がなければ機能ごと表示しない。 */
-const RANKING_URL=window.KITCHEN_RANKING_URL||'';
-const GAME_VERSION='1.0';
-let rankTab='normal';
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function newId(){
-  try{if(crypto.randomUUID)return crypto.randomUUID();}catch(e){}
-  return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,12);
+const RANKING_URL = window.TSUNAGU_RANKING_URL || "";
+const GAME_VERSION = "1.0";
+function newId() {
+  try { if (crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
+  return "id-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 12);
 }
-function readKey(k){try{return localStorage.getItem(k)}catch(e){return null}}
-function writeKey(k,v){try{localStorage.setItem(k,v)}catch(e){}}
-function clientId(){let id=readKey('toriyons-client');if(!id){id=newId();writeKey('toriyons-client',id);}return id;}
-function rankOf(money){return money>=9000?'S':money>=6000?'A':money>=3500?'B':'C';}
+function clientId() {
+  try {
+    let id = localStorage.getItem("tsunagu-client");
+    if (!id) { id = newId(); localStorage.setItem("tsunagu-client", id); }
+    return id;
+  } catch (e) { return newId(); }
+}
+const myRuns = () => readKey("tsunagu-myruns") || [];
+async function postResult(nick) {
+  const { total } = score();
+  const rank = total >= 80 ? "S" : total >= 60 ? "A" : total >= 40 ? "B" : total >= 20 ? "C" : "D";
+  if (!S.runId) S.runId = newId();
+  const body = { action: "submit", nick, total, rank, kankei: Math.round(S.m.kankei), newInd: S.m.newInd, pop: Math.round(S.m.pop),
+    projects: Object.keys(S.projects).length, avatar: S.avatar || "pa", version: GAME_VERSION, runId: S.runId, clientId: clientId() };
+  // Content-Type を付けない（text/plain）ことで、Apps Script へ事前確認なしで送れる
+  const res = await fetch(RANKING_URL, { method: "POST", body: JSON.stringify(body) });
+  const j = await res.json();
+  if (j.ok) { S.submitted = true; save(); writeKey("tsunagu-myruns", [...myRuns(), S.runId].slice(-50)); }
+  return j;
+}
+async function fetchRanking() {
+  const res = await fetch(`${RANKING_URL}${RANKING_URL.includes("?") ? "&" : "?"}action=top&limit=50`);
+  const j = await res.json();
+  if (!j.ok) throw new Error("bad");
+  return j;
+}
+const RANK_ERR = { nick: "ニックネームを確かめてください（12文字まで。URLやメールアドレスは使えません）。", too_fast: "少し時間をおいてから、もう一度送ってください。", score: "結果を送れませんでした。", id: "結果を送れませんでした。", server: "受付側でエラーが起きました。時間をおいて試してください。" };
 
-/* ---------- icons ---------- */
-function icon(d,wrapped=true){
-  const st=`stroke="${INK}" stroke-width="1.8"`;
-  if(d==='burger') return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="6" y="7" width="28" height="9" rx="4.5" fill="#f1e6c9" ${st}/><rect x="4.5" y="16" width="31" height="3.6" rx="1.8" fill="#6cbf4f" ${st}/><rect x="6" y="19.6" width="28" height="3.4" fill="#fffdf5" ${st}/><rect x="6" y="23" width="28" height="3" fill="#e5483d" ${st}/><rect x="6" y="26" width="28" height="8" rx="4" fill="#f1e6c9" ${st}/>${wrapped?`<path d="M5 22h30v13H5z" fill="#fff" ${st} opacity=".92"/><path d="M5 27h30" stroke="#e9564c" stroke-width="1.5"/>`:''}</svg>`;
-  if(d==='soba') return `<svg viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="20" cy="27" rx="17" ry="8" fill="#fff" ${st}/><ellipse cx="20" cy="23" rx="11.5" ry="7" fill="#d9a35a" ${st}/><path d="M12 22q4-3 8 0t8 0M13 25q4-3 8 0t7 0" stroke="#a96f2c" stroke-width="1.2" fill="none"/><ellipse cx="16" cy="20" rx="3" ry="1.8" fill="#3f9a3a"/><ellipse cx="23" cy="19.5" rx="2.4" ry=".9" fill="#fff" stroke="#999" stroke-width=".4"/><ellipse cx="20" cy="22.5" rx="2.4" ry=".9" fill="#fff" stroke="#999" stroke-width=".4"/></svg>`;
-  return `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 13h24l-3 22H11z" fill="#fff" ${st}/><path d="M9 20h22" stroke="#3fb8a8" stroke-width="2"/><ellipse cx="20" cy="13" rx="12" ry="3.4" fill="#f2c94c" ${st}/><circle cx="16" cy="12.6" r="1.2" fill="#4caf50"/><circle cx="23" cy="13.4" r="1.2" fill="#4caf50"/><ellipse cx="19.5" cy="12.4" rx="2" ry=".8" fill="#fff"/></svg>`;
-}
-function plateSVG(p){
-  const st=`stroke="${INK}" stroke-width="1.8"`;
-  if(!p) return `<svg viewBox="0 0 80 50"><ellipse cx="40" cy="30" rx="34" ry="14" fill="#fff" ${st}/><ellipse cx="40" cy="28" rx="22" ry="8" fill="none" stroke="#c9d3d8" stroke-width="1.5"/></svg>`;
-  let t='';
-  if(p.tops.includes('shirasu')) t+=[[30,20],[44,18],[50,24],[36,26],[42,23]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="3.4" ry="1.2" fill="#fff" stroke="#888" stroke-width=".4"/>`).join('');
-  if(p.tops.includes('ooba')) t+=`<path d="M38 14q6 2 4 8q-6-1-4-8z" fill="#3f9a3a" ${st} stroke-width="1"/><path d="M46 16q5 3 2 8q-5-2-2-8z" fill="#4fae47" stroke="${INK}" stroke-width="1"/>`;
-  return `<svg viewBox="0 0 80 50"><ellipse cx="40" cy="31" rx="34" ry="14" fill="#fff" ${st}/><ellipse cx="40" cy="25" rx="22" ry="11" fill="#d9a35a" ${st}/><path d="M22 23q6-4 12 0t12 0t12 0M24 28q6-4 12 0t12 0t10 0" stroke="#a96f2c" stroke-width="1.4" fill="none"/>${t}</svg>`;
-}
-function cupSVG(log){
-  const st=`stroke="${INK}" stroke-width="1.8"`;
-  const poured=log.includes('pour');
-  let t='';
-  if(log.includes('negi')) t+=[[30,13],[44,14],[38,11],[50,12]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2" fill="#5bb04b" stroke="${INK}" stroke-width=".6"/>`).join('');
-  if(log.includes('shirasu')) t+=[[34,14],[42,12],[47,15],[28,12]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="3" ry="1.1" fill="#fff" stroke="#888" stroke-width=".4"/>`).join('');
-  return `<svg viewBox="0 0 80 64"><path d="M20 12h40l-5 46H25z" fill="#fff" ${st}/><path d="M22 28h36" stroke="#3fb8a8" stroke-width="3"/>${poured?`<ellipse cx="40" cy="12.5" rx="20" ry="5" fill="#f2c94c" ${st}/><path d="M30 12q4-2 7 0M43 13q4-2 7 0" stroke="#fff6c8" stroke-width="1.3" fill="none"/>`:`<ellipse cx="40" cy="12.5" rx="20" ry="5" fill="#eef2f3" ${st}/>`}${t}</svg>`;
-}
-function custSVG(c){
-  const {skin,hair,shirt,style}=c.look;
-  const m=c.finished?'happy':c.mood;
-  const L=`stroke="${INK}" stroke-width="2.4" fill="none" stroke-linecap="round"`;
-  const mouth=m==='happy'?`<path d="M33 53q7 7 14 0" ${L}/>`:m==='ok'?`<path d="M34 55h12" ${L}/>`:`<path d="M33 57q7-6 14 0" ${L}/>`;
-  const brows=m==='angry'?`<path d="M28 37l7 2.5M52 37l-7 2.5" ${L}/>`:'';
-  let back='',front='';
-  if(style===0) front=`<path d="M18 44c0-15 10-25 22-25s22 10 22 25c-5-7-12-10-22-10s-17 3-22 10z" fill="${hair}" stroke="${INK}" stroke-width="2"/>`;
-  if(style===1){back=`<path d="M16 44c0-17 11-27 24-27s24 10 24 27v26h-9V46H25v24h-9z" fill="${hair}" stroke="${INK}" stroke-width="2"/>`;front=`<path d="M19 42c1-13 10-21 21-21s20 8 21 21c-8-5-14-7-21-7s-13 2-21 7z" fill="${hair}"/>`;}
-  if(style===2) front=`<path d="M18 40c0-13 10-21 22-21s22 8 22 21z" fill="${hair}" stroke="${INK}" stroke-width="2"/><rect x="40" y="36" width="30" height="6" rx="3" fill="${hair}" stroke="${INK}" stroke-width="2"/>`;
-  if(style===3) front=`<circle cx="40" cy="17" r="8" fill="${hair}" stroke="${INK}" stroke-width="2"/><path d="M18 44c0-15 10-25 22-25s22 10 22 25c-5-7-12-10-22-10s-17 3-22 10z" fill="${hair}" stroke="${INK}" stroke-width="2"/>`;
-  return `<svg class="cust-svg" viewBox="0 0 80 92" aria-hidden="true">${back}<path d="M12 92c0-18 12-28 28-28s28 10 28 28z" fill="${shirt}" stroke="${INK}" stroke-width="2.2"/><circle cx="40" cy="45" r="21" fill="${skin}" stroke="${INK}" stroke-width="2.2"/>${front}<circle cx="32" cy="45" r="2.6" fill="${INK}"/><circle cx="48" cy="45" r="2.6" fill="${INK}"/><circle cx="27" cy="52" r="3.5" fill="#f08f8f" opacity=".45"/><circle cx="53" cy="52" r="3.5" fill="#f08f8f" opacity=".45"/>${brows}${mouth}</svg>`;
-}
-
-/* ---------- game state ---------- */
-function newGame(m){
-  mode=m;
-  S={time:SHIFT,money:0,rep:5,happy:0,angry:0,fails:0,sold:0,burnt:0,
-    grill:[null,null,null,null],stock:{patty:0,egg:0},
-    burger:[],plate:null,soup:[],counter:[],sel:null,
-    customers:[],spawnIn:1.2,nextId:1,itemId:1,running:true,over:false,runId:newId(),submitted:false};
-  document.body.classList.toggle('easy',m==='easy');
-  document.querySelectorAll('.easy-only').forEach(e=>e.hidden=m!=='easy');
-  last=0; renderAll();
-}
-const rand=(a,b)=>a+Math.random()*(b-a);
-const pick=a=>a[Math.floor(Math.random()*a.length)];
-const progress=()=>1-S.time/SHIFT;
-function spawn(){
-  const pr=progress();
-  const n=pr<.25?1:(Math.random()<.3+.35*pr?2:1);
-  const pool=['burger','soba','soup'];
-  const order=[];
-  while(order.length<n){const d=pick(pool);if(!order.includes(d))order.push(d);}
-  let max=(52+30*(n-1))*(1-.22*pr)*(mode==='easy'?1.5:1);
-  S.customers.push({id:S.nextId++,order,done:order.map(()=>false),p:max,max,age:0,mood:'happy',say:'',sayT:0,finished:false,leaveIn:0,
-    look:{skin:pick(['#f6d3b3','#eec29b','#d9a57c','#f9e0c7']),hair:pick(['#2b2420','#5a3a22','#8a5a2b','#c9c2b8','#23324a','#e07a3f']),
-      shirt:pick(['#f2c94c','#6fa8dc','#e9564c','#8bc34a','#b39ddb','#ff9e80','#4db6ac']),style:Math.floor(Math.random()*4)}});
-  beep(660,.06);beep(990,.08);
-}
-function nextInterval(){const pr=progress();return (rand(11,16)*(1-pr)+rand(6,9)*pr)*(mode==='easy'?1.25:1);}
-function slotStatus(g){const it=GRILL[g.type];return g.t<it.cook?'raw':g.t<it.burn?'done':'burnt';}
-function moodOf(c){const r=c.p/c.max;return r>.5?'happy':r>.25?'ok':'angry';}
-
-/* ---------- judges ---------- */
-function judgeBurger(st){
-  for(let i=0;i<Math.max(st.length,BURGER_ORDER.length);i++){
-    if(i>=BURGER_ORDER.length) return '具を重ねすぎ';
-    if(i>=st.length) return `${LAYER[BURGER_ORDER[i]]}が足りない`;
-    if(st[i]!==BURGER_ORDER[i]) return `下から${i+1}段目は${LAYER[BURGER_ORDER[i]]}`;
+/* =========================================================
+   音（Web Audio で合成。外部の音声ファイルは使わない）
+   ========================================================= */
+const Sound = (() => {
+  const PREF = "tsunagu-sound";
+  let on = true;
+  try { on = localStorage.getItem(PREF) !== "off"; } catch (e) {}
+  let ctx = null, master, bgmBus, seBus, noiseBuf, cur = null, want = null, step = 0, next = 0;
+  const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  // 陽音階（ヨナ抜き）で、港町と島の2曲＋エンディング。-1 は前の音を伸ばす、0 は休み
+  const FIELD_MEL = [74, 76, 79, 81, 83, 81, 79, 76, 74, -1, 76, 79, 81, -1, -1, -1, 83, 81, 79, 81, 76, 79, 76, 74, 71, 74, 76, -1, 74, -1, -1, -1];
+  const FIELD_BASS = [50, 0, 57, 0, 50, 0, 57, 0, 43, 0, 50, 0, 43, 0, 50, 0, 45, 0, 52, 0, 45, 0, 52, 0, 50, 0, 57, 0, 45, 0, 50, 0];
+  const TRACKS = {
+    field: { bpm: 104, lead: "square", vol: 0.32, mel: FIELD_MEL, bass: FIELD_BASS, hat: true },
+    island: { bpm: 88, lead: "triangle", vol: 0.6, hat: false,
+      mel: [79, -1, 76, 74, 76, -1, 79, 81, 83, -1, 81, 79, 76, -1, -1, -1, 74, 76, 79, -1, 81, 79, 76, 74, 71, -1, 74, 76, 79, -1, -1, -1],
+      bass: [43, 0, 50, 0, 43, 0, 50, 0, 48, 0, 55, 0, 48, 0, 55, 0, 52, 0, 59, 0, 52, 0, 59, 0, 50, 0, 57, 0, 43, 0, 0, 0] },
+    ending: { bpm: 72, lead: "triangle", vol: 0.6, mel: FIELD_MEL, bass: FIELD_BASS, hat: false },
+  };
+  function init() {
+    if (ctx) return true;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    try { ctx = new AC(); } catch (e) { return false; }
+    master = ctx.createGain(); master.gain.value = on ? 1 : 0; master.connect(ctx.destination);
+    bgmBus = ctx.createGain(); bgmBus.gain.value = 0.12; bgmBus.connect(master);
+    seBus = ctx.createGain(); seBus.gain.value = 0.3; seBus.connect(master);
+    noiseBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.6), ctx.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    setInterval(tick, 25);
+    return true;
   }
-  return '';
-}
-function judgeSoba(p){
-  const L=p.log,r=[];
-  if(!L.includes('shirasu_ooba')) r.push('焼きそばにしらすと大葉が入っていない');
-  else if(L[0]!=='shirasu_ooba') r.push('具を入れる前に味付けしている');
-  if(!L.includes('shiodare')) r.push('塩だれが入っていない');
-  if(!L.includes('dashishio')) r.push('だし塩が振られていない');
-  if(!p.tops.includes('shirasu')) r.push('仕上げのしらすがない');
-  if(!p.tops.includes('ooba')) r.push('仕上げの大葉がない');
-  return r[0]||'';
-}
-function judgeSoup(L){
-  if(!L.includes('pour')) return 'たまごスープが入っていない';
-  if(L[0]!=='pour') return 'スープより先に具を入れている';
-  if(!L.includes('negi')) return 'ねぎがのっていない';
-  if(!L.includes('shirasu')) return 'しらすがのっていない';
-  return '';
-}
-function toCounter(dish,reason){
-  if(S.counter.length>=COUNTER_MAX){toast('カウンターがいっぱい。先に提供しよう','bad');return false;}
-  S.counter.push({id:S.itemId++,dish,ok:!reason,reason});
-  beep(780,.06);return true;
-}
-
-/* ---------- actions ---------- */
-const A={
-  place(v){
-    const i=S.grill.findIndex(g=>!g);
-    if(i<0){toast('鉄板がいっぱいです','bad');return;}
-    S.grill[i]={type:v,t:0,log:[]};beep(300,.12,'sawtooth',.03);renderGrill();
-  },
-  slot(_,i){
-    const g=S.grill[i];if(!g)return;
-    const st=slotStatus(g);
-    if(st==='raw'){toast(`${GRILL[g.type].name}はまだ焼けていません`);return;}
-    if(st==='burnt'){S.grill[i]=null;S.burnt++;toast('こげてしまったので捨てました','bad');renderGrill();return;}
-    if(g.type==='soba'){toast('下のボタンで具と味付けをしよう');return;}
-    if(S.stock[g.type]>=TRAY_MAX){toast('保温トレイがいっぱいです','bad');return;}
-    S.stock[g.type]++;S.grill[i]=null;beep(880,.06);renderGrill();renderBurger();
-  },
-  soba(v,i){
-    const g=S.grill[i];if(!g||g.type!=='soba'||slotStatus(g)!=='done')return;
-    if(v==='plate'){
-      if(S.plate){toast('盛り付け台に焼きそばがあります。先に仕上げよう','bad');return;}
-      S.plate={log:g.log.slice(),tops:[]};S.grill[i]=null;beep(520,.08);renderGrill();renderSide();
-      if(isMobile())toast('器に盛りました。「焼きそば」タブで仕上げをのせよう');
-      return;
+  function unlock() {
+    if (!init()) return;
+    if (ctx.state === "suspended" && !document.hidden) ctx.resume().catch(() => {});
+  }
+  function tone(f, t, dur, type, vol, bus, slide) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(bus); o.start(t); o.stop(t + dur + 0.03);
+  }
+  function hiss(t, dur, vol, bus, freq) {
+    const s = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), g = ctx.createGain();
+    s.buffer = noiseBuf; fl.type = "bandpass"; fl.frequency.value = freq;
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(fl); fl.connect(g); g.connect(bus); s.start(t); s.stop(t + dur + 0.03);
+  }
+  function tick() {
+    if (!ctx || ctx.state !== "running") return;
+    if (want !== cur) { cur = want; step = 0; next = ctx.currentTime + 0.1; }
+    const tr = TRACKS[cur];
+    if (!tr) return;
+    const sd = 60 / tr.bpm / 2;
+    if (next < ctx.currentTime) next = ctx.currentTime + 0.05;
+    while (next < ctx.currentTime + 0.15) {
+      const i = step % tr.mel.length, n = tr.mel[i];
+      if (n > 0) {
+        let len = 1;
+        while (tr.mel[(i + len) % tr.mel.length] === -1 && len < 8) len++;
+        tone(hz(n), next, sd * len * 0.92, tr.lead, tr.vol, bgmBus);
+      }
+      const b = tr.bass[i];
+      if (b > 0) tone(hz(b), next, sd * 1.8, "triangle", 0.7, bgmBus);
+      if (tr.hat && i % 2 === 1) hiss(next, 0.04, 0.1, bgmBus, 7000);
+      next += sd; step++;
     }
-    if(g.log.includes(v))return;
-    g.log.push(v);beep(600,.05);renderGrill();
-  },
-  layer(v){
-    if(S.burger.length>=9){toast('これ以上重ねられません','bad');return;}
-    if(v==='rice'||v==='egg'){
-      const k=v==='rice'?'patty':'egg';
-      if(S.stock[k]<=0){toast(v==='rice'?'焼けたライスパテがありません':'焼けた目玉焼きがありません','bad');return;}
-      S.stock[k]--;renderGrillTray();
-    }
-    S.burger.push(v);beep(500+S.burger.length*40,.05);renderBurger();
-  },
-  wrap(){
-    if(!S.burger.length){toast('まだ何も重ねていません');return;}
-    if(!toCounter('burger',judgeBurger(S.burger)))return;
-    S.burger=[];renderBurger();renderCounter();
-  },
-  'burger-clear'(){if(S.burger.length){S.burger=[];toast('バーガーを作り直します');renderBurger();}},
-  top(v){
-    if(!S.plate)return;
-    if(!S.plate.tops.includes(v)){S.plate.tops.push(v);beep(640,.05);}
-    renderSide();
-  },
-  'plate-serve'(){if(!S.plate)return;if(!toCounter('soba',judgeSoba(S.plate)))return;S.plate=null;renderSide();renderCounter();},
-  'plate-clear'(){if(S.plate){S.plate=null;toast('焼きそばを捨てました');renderSide();}},
-  soup(v){if(!S.soup.includes(v)){S.soup.push(v);beep(v==='pour'?420:640,.06);}renderSide();},
-  'soup-serve'(){if(!S.soup.length){toast('カップが空です');return;}if(!toCounter('soup',judgeSoup(S.soup)))return;S.soup=[];renderSide();renderCounter();},
-  'soup-clear'(){if(S.soup.length){S.soup=[];toast('スープを作り直します');renderSide();}},
-  pick(v){v=+v;S.sel=S.sel===v?null:v;renderCounter();},
-  trash(){
-    if(S.sel==null){toast('捨てる品をカウンターで選んでください');return;}
-    S.counter=S.counter.filter(x=>x.id!==S.sel);S.sel=null;toast('品を捨てました');renderCounter();
-  },
-  cust(v){serveTo(+v);},
-};
-function serveTo(cid){
-  const c=S.customers.find(x=>x.id===cid);if(!c||c.finished)return;
-  const need=c.order.filter((d,i)=>!c.done[i]);
-  const item=S.sel!=null?S.counter.find(x=>x.id===S.sel):S.counter.find(x=>need.includes(x.dish));
-  if(!item){toast(S.counter.length?'このお客さんの注文の品がカウンターにありません':'カウンターに完成品がありません');return;}
-  const idx=c.order.findIndex((d,i)=>d===item.dish&&!c.done[i]);
-  if(idx<0){say(c,'それは頼んでないよ');return;}
-  S.counter=S.counter.filter(x=>x!==item);S.sel=null;
-  if(item.ok){
-    c.done[idx]=true;
-    const r=c.p/c.max,tip=r>.6?100:r>.3?50:0;
-    S.money+=DISH[item.dish].price+tip;S.sold++;
-    toast(`${DISH[item.dish].short} ${DISH[item.dish].price}円${tip?` ＋チップ${tip}円`:''}`,'good');
-    beep(1046,.08);beep(1318,.12);
-    if(c.done.every(Boolean)){c.finished=true;c.leaveIn=1.3;S.happy++;say(c,'ごちそうさま！');}
-    else say(c,'おいしそう！');
-  }else{
-    S.rep--;S.fails++;say(c,'注文とちがう…');
-    toast(`作り方ちがい：${item.reason}`,'bad');beep(180,.25,'square',.04);
   }
-  renderAll();
-  if(S.rep<=0)endGame('rep');
-}
-function say(c,t){c.say=t;c.sayT=1.8;renderCustomers();}
+  const SE = {
+    next: (t) => tone(1320, t, 0.035, "square", 0.22, seBus),
+    sel: (t) => { tone(988, t, 0.05, "square", 0.28, seBus); tone(1319, t + 0.05, 0.07, "square", 0.28, seBus); },
+    discover: (t) => [784, 988, 1175, 1568].forEach((f, i) => tone(f, t + i * 0.07, 0.13, "square", 0.3, seBus)),
+    trust: (t) => { tone(1047, t, 0.09, "triangle", 0.55, seBus); tone(1568, t + 0.09, 0.2, "triangle", 0.55, seBus); },
+    project: (t) => {
+      [523, 659, 784].forEach((f, i) => tone(f, t + i * 0.1, 0.12, "square", 0.28, seBus));
+      [523, 659, 784, 1047].forEach((f) => tone(f, t + 0.32, 0.7, "square", 0.14, seBus));
+    },
+    levelup: (t) => [392, 523, 659, 784, 1047].forEach((f, i) => tone(f, t + i * 0.08, i === 4 ? 0.5 : 0.1, "square", 0.28, seBus)),
+    move: (t) => hiss(t, 0.28, 0.3, seBus, 1500),
+    ship: (t) => { tone(196, t, 0.55, "sawtooth", 0.16, seBus); tone(247, t, 0.55, "sawtooth", 0.1, seBus); hiss(t + 0.15, 0.6, 0.18, seBus, 800); },
+    month: (t) => { tone(1568, t, 1.0, "sine", 0.4, seBus); tone(2093, t + 0.14, 1.0, "sine", 0.3, seBus); },
+    bad: (t) => tone(392, t, 0.5, "square", 0.28, seBus, 185),
+  };
+  function se(name) {
+    if (!on || !ctx || ctx.state !== "running" || !SE[name]) return;
+    SE[name](ctx.currentTime + 0.01);
+  }
+  function bgm(name) { want = name; }
+  function toggle() {
+    on = !on;
+    try { localStorage.setItem(PREF, on ? "on" : "off"); } catch (e) {}
+    unlock();
+    if (master) master.gain.setTargetAtTime(on ? 1 : 0, ctx.currentTime, 0.05);
+    return on;
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (!ctx) return;
+    if (document.hidden) ctx.suspend().catch(() => {}); else ctx.resume().catch(() => {});
+  });
+  ["pointerdown", "keydown"].forEach((ev) => document.addEventListener(ev, unlock));
+  return { se, bgm, toggle, unlock, isOn: () => on };
+})();
 
-/* ---------- loop ---------- */
-function loop(ts){
-  requestAnimationFrame(loop);
-  if(!S||!S.running||S.over){last=0;return;}
-  if(!last)last=ts;
-  const dt=Math.min(.1,(ts-last)/1000);last=ts;
-  update(dt);
-}
-function update(dt){
-  S.time-=dt;
-  if(S.time<=0){S.time=0;renderTop();endGame('time');return;}
-  let g=false;
-  S.grill.forEach(s=>{if(!s)return;const b=slotStatus(s);s.t+=dt;const a=slotStatus(s);
-    if(a!==b){g=true;if(a==='done')beep(880,.07);if(a==='burnt')beep(150,.2,'square',.04);}});
-  if(g)renderGrill();else updateGrillBars();
-  let cc=false;
-  for(const c of [...S.customers]){
-    c.age+=dt;
-    if(c.sayT>0){c.sayT-=dt;if(c.sayT<=0){c.say='';cc=true;}}
-    if(c.finished){c.leaveIn-=dt;if(c.leaveIn<=0){S.customers=S.customers.filter(x=>x!==c);cc=true;}continue;}
-    c.p-=dt;
-    const m=moodOf(c);if(m!==c.mood){c.mood=m;cc=true;}
-    if(c.p<=0){S.customers=S.customers.filter(x=>x!==c);S.rep--;S.angry++;cc=true;
-      toast('待ちきれずにお客さんが帰ってしまった…','bad');beep(200,.3,'triangle',.05);renderTop();
-      if(S.rep<=0){renderCustomers();endGame('rep');return;}}
-  }
-  S.spawnIn-=dt;
-  if(S.spawnIn<=0){
-    if(S.customers.length<3&&S.time>12){spawn();cc=true;}
-    S.spawnIn=S.customers.length>=3?2:nextInterval();
-    if(!S.customers.length)S.spawnIn=Math.min(S.spawnIn,2);
-  }
-  if(cc)renderCustomers();else updateCustBars();
-  renderTime();
+/* =========================================================
+   補助
+   ========================================================= */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = (n) => Math.round(n).toLocaleString("ja-JP");
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const monthIdx = (t) => t % 12;
+const calYear = (t) => 2026 + Math.floor((t + 3) / 12);
+const calMonth = (t) => ((t + 3) % 12) + 1;
+const termYear = (t) => Math.floor(t / 12) + 1;
+const dateLabel = (t) => `${calYear(t)}年${calMonth(t)}月`;
+const trust = (id) => S.trust[id] || 0;
+const hearts = (n) => "♥".repeat(n) + "♡".repeat(5 - n);
+const npcAvail = (id) => !NPC[id].needFlag || S.flags[NPC[id].needFlag];
+const unitSpend = (m) => (1 - m.stay) * 3000 + m.stay * 18000;
+const annualTourists = (m) => TOURIST_BASE * m.idx;
+const annualSpend = (m) => annualTourists(m) * unitSpend(m);
+const activeCount = () => Object.keys(S.projects).length;
+const projCost = (p) => Math.round(p.cost * (1 - 0.07 * S.skills.plan));
+
+function moveCost(from, to) {
+  if (from === to) return 0;
+  const fi = DIST[from].island, ti = DIST[to].island;
+  if (fi && ti) return 1;
+  if (fi || ti) return (fi ? to : from) === "morozaki" ? 1 : 2;
+  return 1;
 }
 
-/* ---------- render ---------- */
-function renderAll(){renderTop();renderCustomers();renderCounter();renderGrill();renderBurger();renderSide();}
+/* =========================================================
+   会話窓
+   ========================================================= */
+let typing = null;
+let curFace = null; // 会話窓に出している顔の id
+function setFace(id) {
+  const img = $("#face");
+  curFace = id && CHAR[id] ? id : null;
+  if (!curFace) { img.hidden = true; return; }
+  img.hidden = false;
+  img.style.background = charBg(curFace);
+  img.src = faceURL(curFace, baseMouth(curFace));
+  img.alt = NPC[curFace] ? NPC[curFace].name : "あなた";
+}
+// 誰の顔を出すか：人物名なら本人、地の文（who なし）ならプレイヤー、見出しつきの知らせは顔なし
+function faceFor(who, face) {
+  if (face !== undefined) return face;
+  if (!who) return S ? S.avatar || "pa" : null;
+  return NAME2ID[who] || null;
+}
+setInterval(() => {
+  if (!curFace || typing || document.hidden) return;
+  const img = $("#face");
+  img.src = faceURL(curFace, baseMouth(curFace), "blink");
+  setTimeout(() => { if (curFace) img.src = faceURL(curFace, baseMouth(curFace)); }, 140);
+}, 3400);
 
-/* スマホ幅では調理場を1つずつ表示し、下のタブで工程を切り替える */
-const TABS=[['grill','鉄板'],['burger','バーガー'],['soba','焼きそば'],['soup','スープ']];
-const isMobile=()=>matchMedia('(max-width:760px)').matches;
-function grillIcon(){return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="13" width="34" height="18" rx="4" fill="#3d464b" stroke="${INK}" stroke-width="1.8"/><ellipse cx="14" cy="22" rx="7" ry="4.2" fill="#efe8d4" stroke="${INK}" stroke-width="1.5"/><ellipse cx="27" cy="22" rx="6.5" ry="4.2" fill="#fff" stroke="${INK}" stroke-width="1.5"/><circle cx="27" cy="22" r="2.2" fill="#f5b324"/></svg>`;}
-function buildTabs(){
-  $('#tabbar').innerHTML=TABS.map(([k,n])=>`<button class="tab" data-a="tab" data-v="${k}">${k==='grill'?grillIcon():icon(k,k!=='burger')}<span>${n}</span><i class="badge" id="bd-${k}"></i></button>`).join('');
-  setTab(document.body.dataset.tab||'grill');
+function show(who, text, options, resolve, face) {
+  const whoEl = $("#who"), txt = $("#txt"), ch = $("#choices");
+  whoEl.textContent = who || "";
+  ch.innerHTML = "";
+  setFace(faceFor(who, face));
+  if (typing) { clearInterval(typing.timer); typing = null; }
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const full = text;
+  const img = $("#face"), talker = curFace;
+  const finish = () => {
+    if (typing) { clearInterval(typing.timer); typing = null; }
+    txt.textContent = full;
+    if (talker && curFace === talker) img.src = faceURL(talker, baseMouth(talker));
+  };
+  if (reduce || !options) { txt.textContent = full; }
+  else {
+    let i = 0, tick = 0; txt.textContent = "";
+    typing = { timer: setInterval(() => {
+      i += 2; tick++;
+      txt.textContent = full.slice(0, i);
+      if (talker && who && tick % 3 === 0) img.src = faceURL(talker, (tick / 3) % 2 ? "open" : baseMouth(talker));
+      if (i >= full.length) finish();
+    }, 22) };
+  }
+  txt.onclick = finish;
+  if (!options) return;
+  options.forEach((o) => {
+    const b = document.createElement("button");
+    b.className = "ch" + (o.next ? " next" : "");
+    b.textContent = o.label;
+    b.onclick = () => {
+      if (typing) { finish(); return; }
+      Sound.se(o.next ? "next" : "sel");
+      ch.innerHTML = ""; resolve(o.value);
+    };
+    ch.appendChild(b);
+  });
+  const first = ch.querySelector("button"); if (first) first.focus({ preventScroll: true });
 }
-function setTab(t){
-  document.body.dataset.tab=t;
-  document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-current',String(b.dataset.v===t)));
-  if(isMobile())$('.kitchen').scrollTop=0;
+function say(who, text, face) { return new Promise((res) => show(who, text, [{ label: "次へ", value: 0, next: true }], res, face)); }
+function choose(who, text, labels, face) { return new Promise((res) => show(who, text, labels.map((l, i) => ({ label: l, value: i })), res, face)); }
+function idle() {
+  if (!S || S.over) return;
+  const d = DIST[S.loc];
+  const tip = S.ap === 0 ? "行動力が残っていない。右の「今月を終える」で次の月へ進もう。" : "歩いて探す・人と話す・発信する。見つけた魅力と信頼がそろったら「企画」を開こう。";
+  show(null, `${dateLabel(S.turn)}　${d.name}にいる。行動力は残り ${S.ap}。\n${tip}`, null);
 }
-function setBadge(k,text,alert){
-  const el=document.getElementById('bd-'+k);if(!el)return;
-  if(el.textContent!==text)el.textContent=text;
-  el.classList.toggle('alert',!!alert);
-}
-function updateTabs(){
-  if(!S)return;
-  let ready=0,danger=false;
-  S.grill.forEach(g=>{if(!g)return;const st=slotStatus(g),it=GRILL[g.type];
-    if(st!=='raw')ready++;
-    if(st==='burnt'||(st==='done'&&(g.t-it.cook)/(it.burn-it.cook)>.6))danger=true;});
-  setBadge('grill',ready?String(ready):'',danger);
-  setBadge('burger',S.burger.length?String(S.burger.length):'');
-  setBadge('soba',S.plate?'!':'',!!S.plate);
-  setBadge('soup',S.soup.length?String(S.soup.length):'');
-}
-function fmt(t){t=Math.ceil(t);return `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;}
-function renderTime(){$('#v-time').textContent=fmt(S.time);$('#st-time').classList.toggle('low',S.time<=30);}
-function renderTop(){
-  renderTime();
-  $('#v-money').textContent=S.money.toLocaleString()+'円';
-  $('#v-rep').innerHTML=[0,1,2,3,4].map(i=>i<S.rep?'♥':'<span class="off">♥</span>').join('');
-}
-function renderCustomers(){
-  const el=$('#customers');
-  if(!S.customers.length){el.innerHTML=`<div class="empty-q">${S.time>12?'次のお客さんを待っています…':'まもなく閉店です'}</div>`;return;}
-  el.innerHTML=S.customers.map(c=>`
-    <button class="cust${c.age<.45?' enter':''}" data-a="cust" data-v="${c.id}" data-cid="${c.id}" aria-label="お客さん${c.id}番に提供">
-      ${c.say?`<span class="say">${c.say}</span>`:''}
-      <div class="ticket"><div class="no"><span>伝票 No.${String(c.id).padStart(3,'0')}</span><span>${c.order.length}品</span></div>
-        <ul>${c.order.map((d,i)=>`<li class="${c.done[i]?'done':''}">${icon(d)}${DISH[d].short}</li>`).join('')}</ul></div>
-      ${custSVG(c)}
-      <div class="pbar"><i></i></div>
-    </button>`).join('');
-  updateCustBars();
-}
-function updateCustBars(){
-  for(const c of S.customers){
-    const i=document.querySelector(`[data-cid="${c.id}"] .pbar i`);if(!i)continue;
-    const r=c.finished?1:Math.max(0,c.p/c.max);
-    i.style.width=(r*100)+'%';
-    i.style.background=r>.5?'var(--ok)':r>.25?'var(--warn)':'var(--bad)';
+async function run(fn) {
+  if (busy || !S || S.over) return;
+  busy = true; render();
+  const before = { ...S.m, budget: S.budget };
+  try { await fn(); } finally {
+    busy = false; diffToasts(before); save(); render(); if (!S.over) idle();
   }
 }
-function renderCounter(){
-  const el=$('#counter');
-  if(!S.counter.length){el.innerHTML='<span class="hint">ここに完成品が並びます（最大5品）</span>';return;}
-  el.innerHTML=S.counter.map(x=>`<button class="citem${S.sel===x.id?' sel':''}" data-a="pick" data-v="${x.id}">${icon(x.dish)}${DISH[x.dish].short}</button>`).join('');
+
+/* =========================================================
+   トースト
+   ========================================================= */
+function toast(t, minus) {
+  const el = document.createElement("div");
+  el.className = "toast" + (minus ? " minus" : ""); el.textContent = t;
+  $("#toasts").appendChild(el); setTimeout(() => el.remove(), 2700);
 }
-function renderGrill(){
-  $('#grill').innerHTML=S.grill.map((g,i)=>{
-    if(!g)return `<div class="slot empty">空き</div>`;
-    const st=slotStatus(g),it=GRILL[g.type];
-    const tops=g.type==='soba'&&g.log.includes('shirasu_ooba')?'<span class="t-shirasu"></span><span class="t-ooba"></span>':'';
-    const label=st==='raw'?`${it.name}<br>焼いています`:st==='burnt'?'こげた…<br>タップで捨てる':g.type==='soba'?'焼けた！<br>具と味付け':`${it.name} 焼けた！<br>タップでトレイへ`;
-    const acts=g.type==='soba'&&st==='done'?`<div class="soba-acts">${SOBA_ACTS.map(([k,n])=>`<button class="mini${k==='plate'?' plate':''}" data-a="soba" data-i="${i}" data-v="${k}" ${k!=='plate'&&g.log.includes(k)?'disabled':''}>${n}</button>`).join('')}</div>`:'';
-    return `<div class="slot ${st}" data-slot="${i}"><button class="slot-hit" data-a="slot" data-i="${i}"><div class="food ${g.type} ${st==='burnt'?'burnt':''}">${tops}</div><span class="slot-label">${label}</span></button><div class="bar"><i></i></div>${acts}</div>`;
-  }).join('');
-  updateGrillBars();renderGrillTray();
-}
-function updateGrillBars(){
-  updateTabs();
-  S.grill.forEach((g,i)=>{
-    if(!g)return;const el=document.querySelector(`[data-slot="${i}"]`);if(!el)return;
-    const it=GRILL[g.type],st=slotStatus(g),bar=el.querySelector('.bar i'),food=el.querySelector('.food');
-    food.style.setProperty('--p',Math.min(1,g.t/it.cook));
-    if(st==='raw'){bar.style.width=(g.t/it.cook*100)+'%';bar.style.background='var(--warn)';}
-    else if(st==='done'){bar.style.width=((1-(g.t-it.cook)/(it.burn-it.cook))*100)+'%';bar.style.background=(g.t-it.cook)/(it.burn-it.cook)>.6?'var(--bad)':'var(--ok)';}
-    else{bar.style.width='100%';bar.style.background='#5a3a2a';}
+function diffToasts(b) {
+  const m = S.m;
+  const items = [
+    ["関係人口", m.kankei - b.kankei, 1, "人"], ["予算", S.budget - b.budget, 1, "万円"],
+    ["漁業", m.fish - b.fish, 0.3, ""], ["農業", m.agri - b.agri, 0.3, ""], ["観光・商業", m.shop - b.shop, 0.3, ""],
+    ["満足度", m.sat - b.sat, 0.3, ""], ["新しい産業", m.newInd - b.newInd, 1, ""],
+  ];
+  items.forEach(([k, d, th, u]) => {
+    if (Math.abs(d) >= th) toast(`${k} ${d > 0 ? "+" : ""}${Math.abs(d) >= 10 || th === 1 ? fmt(d) : d.toFixed(1)}${u}`, d < 0);
   });
 }
-function renderGrillTray(){
-  $('#tray').innerHTML=`保温トレイ
-    <span class="ti"><span class="mini-patty"></span>ライスパテ <span class="n">${S.stock.patty}</span></span>
-    <span class="ti"><span class="mini-egg"></span>目玉焼き <span class="n">${S.stock.egg}</span></span>`;
-  const r=document.querySelector('[data-v="rice"] .cnt'),e=document.querySelector('[data-v="egg"][data-a="layer"] .cnt');
-  if(r){r.textContent=S.stock.patty;r.closest('button').disabled=S.stock.patty<=0;}
-  if(e){e.textContent=S.stock.egg;e.closest('button').disabled=S.stock.egg<=0;}
-}
-function renderBurger(){
-  updateTabs();
-  const b=S.burger;
-  $('#board').innerHTML=b.length?b.map(k=>`<div class="layer l-${k}"></div>`).join(''):'<div class="ph">まな板の上に、下から順に重ねていきます</div>';
-  const ing=[['rice','ライス','#efe8d4',S.stock.patty],['lettuce','レタス','#6cbf4f'],['egg','たまご','radial-gradient(circle,#f5b324 0 4px,#fff 4.5px)',S.stock.egg],
-    ['tomato','トマト','#e5483d'],['shirasu','しらす','#f3efe4'],['jelly','ジュレ','rgba(196,120,40,.6)']];
-  $('#ing').innerHTML=ing.map(([k,n,c,cnt])=>`<button class="btn" data-a="layer" data-v="${k}" ${cnt!==undefined&&cnt<=0?'disabled':''}><span class="chip" style="background:${c}"></span>${n}${cnt!==undefined?`<span class="cnt">${cnt}</span>`:''}</button>`).join('');
-  const h=$('#burger-hint');
-  if(mode!=='easy'){h.innerHTML='';return;}
-  const okPrefix=b.every((k,i)=>BURGER_ORDER[i]===k)&&b.length<=7;
-  if(!okPrefix)h.innerHTML='<div class="nexthint bad">順番ちがい！「やり直す」で作り直そう</div>';
-  else if(b.length===7)h.innerHTML='<div class="nexthint">完成！紙でくるもう</div>';
-  else{
-    const nx=BURGER_ORDER[b.length];
-    const lack=(nx==='rice'&&S.stock.patty<=0)?'（鉄板でライスパテを焼こう）':(nx==='egg'&&S.stock.egg<=0)?'（鉄板で目玉焼きを焼こう）':'';
-    h.innerHTML=`<div class="nexthint">次は「${LAYER[nx]}」${lack}</div>${lack?'<button class="btn small m-only" style="width:100%;margin-top:6px" data-a="tab" data-v="grill">鉄板へ移動 →</button>':''}`;
+
+/* =========================================================
+   成長
+   ========================================================= */
+async function gainExp(n) {
+  S.exp += n;
+  while (S.lv < LV_EXP.length && S.exp >= LV_EXP[S.lv]) {
+    S.lv++;
+    Sound.se("levelup");
+    const opts = [
+      ["企画力", "plan", "プロジェクトの費用が10%下がる"], ["発信力", "post", "発信と関係人口の伸びが大きくなる"],
+      ["交渉力", "nego", "話すと信頼が多めに上がることがある"], ["体力", "stamina", "毎月の行動力が1増える"],
+    ].filter((o) => S.skills[o[1]] < 3);
+    if (!opts.length) continue;
+    const i = await choose("レベルアップ", `レベル${S.lv}になった！\n伸ばしたい力をひとつ選ぼう。`, opts.map((o) => `${o[0]}（${o[2]}）`));
+    const k = opts[i][1]; S.skills[k]++;
+    if (k === "stamina") { S.apMax++; S.ap++; }
   }
 }
-function renderSide(){
-  updateTabs();
-  const p=S.plate;
-  $('#plate-area').innerHTML=`<h2>焼きそば盛り付け <small>${p?'仕上げをのせる':'鉄板の「器に盛る」でここへ'}</small></h2>
-    ${!p?'<button class="btn small m-only" data-a="tab" data-v="grill">鉄板で焼きそばを作る →</button>':''}
-    <div class="vis">${plateSVG(p)}</div>
+function addTrust(id, n) { if (n > 0 && trust(id) < 5) Sound.se("trust"); S.trust[id] = clamp(trust(id) + n, 0, 5); }
+function discover(id, quiet) {
+  if (S.found[id] !== undefined) return false;
+  S.found[id] = S.turn;
+  Sound.se("discover");
+  if (!quiet) { const c = CARDS[id]; toast(`${c.t === "charm" ? "魅力" : "課題"}を発見：${c.name}`); }
+  return true;
+}
+function spend(n) { if (S.ap < n) return false; S.ap -= n; return true; }
+function applyEff(e, mult = 1) {
+  const m = S.m;
+  if (e.kankei) m.kankei += e.kankei * mult * (1 + 0.15 * S.skills.post);
+  if (e.pop) m.pop += e.pop * mult;
+  if (e.fish) m.fish += e.fish * mult;
+  if (e.agri) m.agri += e.agri * mult;
+  if (e.shop) m.shop += e.shop * mult;
+  if (e.sat) m.sat += e.sat * mult;
+  if (e.idx) m.idx += e.idx / 100;
+  if (e.stay) m.stay += e.stay / 100;
+  normalize();
+}
+function normalize() {
+  const m = S.m;
+  m.fish = clamp(m.fish, 40, 160); m.agri = clamp(m.agri, 40, 160); m.shop = clamp(m.shop, 40, 160);
+  m.sat = clamp(m.sat, 0, 100); m.stay = clamp(m.stay, 0.05, 0.7); m.idx = clamp(m.idx, 0.4, 2); m.kankei = Math.max(0, m.kankei);
+}
+
+/* =========================================================
+   行動
+   ========================================================= */
+function explore() {
+  run(async () => {
+    if (!spend(1)) return;
+    const d = DIST[S.loc];
+    const next = d.cards.find((id) => S.found[id] === undefined);
+    if (next) {
+      discover(next, true);
+      const c = CARDS[next];
+      await say("発見", `${d.name}を歩いて、${c.t === "charm" ? "隠れた魅力" : "町の課題"}を見つけた！\n「${c.name}」`);
+      await say(null, c.text);
+      await gainExp(6);
+    } else {
+      S.m.kankei += 5;
+      await say(null, pick(d.idle) + "\n（この地区で新しく見つかるものは、もうなさそうだ）");
+      await gainExp(2);
+    }
+  });
+}
+
+function post() {
+  run(async () => {
+    const d = DIST[S.loc];
+    const n = d.cards.filter((id) => S.found[id] !== undefined && CARDS[id].t === "charm").length;
+    if (!n || S.posted[S.loc] || !spend(1)) return;
+    S.posted[S.loc] = true; S.posts++;
+    const gain = Math.round(20 * n * (1 + 0.3 * S.skills.post) * (S.flags.digital ? 1.2 : 1));
+    S.m.kankei += gain;
+    const charm = CARDS[pick(d.cards.filter((id) => S.found[id] !== undefined && CARDS[id].t === "charm"))];
+    await say("発信", `「${charm.name}」の写真と物語をSNSに投稿した。\n町の外から ${fmt(gain)} 人ほどが反応してくれた。`);
+    await gainExp(5);
+  });
+}
+
+function npcMenu(id) {
+  run(async () => {
+    const p = NPC[id];
+    const opts = [];
+    const canTalk = !S.talked[id];
+    opts.push(canTalk ? "話す（行動力1）" : "話す（今月はもう話した）");
+    opts.push(S.met[id] ? (S.helped[id] ? "手伝う（今月はもう手伝った）" : "手伝う（行動力2）") : "手伝う（まず話してみよう）");
+    opts.push("やめる");
+    const i = await choose(p.name, `${p.role}。信頼 ${hearts(trust(id))}`, opts);
+    if (i === 0) await talk(id);
+    if (i === 1) await help(id);
+  });
+}
+
+async function talk(id) {
+  const p = NPC[id];
+  if (S.talked[id]) { await say(p.name, `「${PROFILE[id].again}」\n（今月はもう話した。次は来月か、手伝ってみよう）`); return; }
+  if (!spend(1)) { await say(null, "行動力が足りない。"); return; }
+  const first = !S.met[id];
+  S.talked[id] = true; S.met[id] = true;
+  const t = trust(id);
+  await say(p.name, `「${p.lines[t]}」`);
+  if (first) {
+    const pf = PROFILE[id];
+    await say(`${p.name}（${pf.age}歳）`, `${pf.profile}\n好きなもの：${pf.like}`, id);
+  }
+  if (p.reveal && p.reveal[t] && discover(p.reveal[t], true)) {
+    const c = CARDS[p.reveal[t]];
+    await say("発見", `話の中から、${c.t === "charm" ? "隠れた魅力" : "町の課題"}がわかった。\n「${c.name}」\n${c.text}`);
+  }
+  let gain = 1;
+  if (S.skills.nego && Math.random() < 0.25 * S.skills.nego) gain = 2;
+  addTrust(id, gain);
+  if (gain === 2) toast(`${p.name}の信頼 +2`); else toast(`${p.name}の信頼 +1`);
+  await gainExp(4);
+  // 隠れたイベント
+  if (id === "hamada" && trust(id) >= 3 && !S.flags.satoIn && S.turn >= 3) await satoArrives();
+}
+
+async function help(id) {
+  const p = NPC[id];
+  if (!S.met[id] || S.helped[id]) return;
+  if (!spend(2)) { await say(null, "行動力が足りない（手伝うには2必要）。"); return; }
+  S.helped[id] = true;
+  addTrust(id, 1);
+  applyEff(p.helpEff);
+  await say(null, `${p.help}\n${p.name}の信頼が上がった。`);
+  await gainExp(8);
+}
+
+function moveTo(to) {
+  run(async () => {
+    const c = moveCost(S.loc, to);
+    if (to === S.loc) return;
+    const i = await choose(null, `${DIST[to].name}へ移動しますか？（行動力${c}）`, [`${DIST[to].name}へ行く`, "やめる"]);
+    if (i !== 0) return;
+    if (!spend(c)) { await say(null, "行動力が足りない。今月はここまでにしよう。"); return; }
+    const from = S.loc; S.loc = to;
+    const toI = DIST[to].island, fromI = DIST[from].island;
+    Sound.se(toI || fromI ? "ship" : "move");
+    render();
+    let msg;
+    if (toI && fromI) msg = "島と島を結ぶ船に乗った。";
+    else if (toI) msg = (from === "morozaki" ? "" : "車で師崎港へ向かい、") + "高速船で島へ渡った。";
+    else if (fromI) msg = "船で師崎港へ戻った。" + (to === "morozaki" ? "" : `そこから${DIST[to].name}へ向かった。`);
+    else msg = to === "utsumi" ? "国道247号を走り、内海に着いた。" : `${DIST[to].name}に着いた。`;
+    await say(null, msg);
+  });
+}
+
+function startProject(id) {
+  run(async () => {
+    const p = PROJ[id];
+    if (!canStart(id).ok) return;
+    closeSheet();
+    S.budget -= projCost(p); S.ap -= 2;
+    S.projects[id] = { start: S.turn };
+    if (p.flag) S.flags[p.flag] = true;
+    if (p.once) applyEff(p.once);
+    if (p.newInd) S.m.newInd++;
+    Sound.se("project");
+    await say("プロジェクト開始", `「${p.name}」が動き出した！\n${p.desc}`);
+    for (const [who, line] of p.launch) await say(NPC[who].name, `「${line}」`);
+    if (p.newInd) await say(null, `町に新しい仕事が生まれた：${p.newInd}`);
+    await gainExp(20);
+  });
+}
+
+function reqStatus(id) {
+  const p = PROJ[id], r = p.req, out = [];
+  (r.cards || []).forEach((c) => out.push({ ok: S.found[c] !== undefined, label: S.found[c] !== undefined ? CARDS[c].name : `？？？（${DIST[CARDS[c].d].name}で見つかるかも）`, type: CARDS[c].t }));
+  Object.entries(r.trust || {}).forEach(([n, v]) => {
+    const okNpc = npcAvail(n);
+    out.push({ ok: trust(n) >= v, label: `${S.met[n] ? NPC[n].name : (okNpc ? DIST[NPC[n].d].name + "の誰か" : "まだ出会っていない人")} ♥${v}以上` });
+  });
+  if (r.minProjects) out.push({ ok: activeCount() >= r.minProjects, label: `動いているプロジェクト ${r.minProjects}つ以上（今${activeCount()}）` });
+  return out;
+}
+function canStart(id) {
+  const p = PROJ[id];
+  if (S.projects[id]) return { ok: false, why: "実施中" };
+  if (p.needFlag && !S.flags[p.needFlag]) return { ok: false, why: "条件未達" };
+  const rs = reqStatus(id);
+  if (!rs.every((r) => r.ok)) return { ok: false, why: "条件未達" };
+  if (S.budget < projCost(p)) return { ok: false, why: "予算不足" };
+  if (S.ap < 2) return { ok: false, why: "行動力不足" };
+  return { ok: true };
+}
+function projVisible(id) {
+  const p = PROJ[id];
+  if (S.projects[id]) return true;
+  if (p.needFlag && !S.flags[p.needFlag]) return false;
+  const r = p.req;
+  if ((r.cards || []).some((c) => S.found[c] !== undefined)) return true;
+  if (Object.keys(r.trust || {}).some((n) => trust(n) >= 2)) return true;
+  return false;
+}
+
+/* =========================================================
+   月の終わり
+   ========================================================= */
+function snapshot() { const m = S.m; return { t: S.turn, pop: m.pop, kankei: m.kankei, tour: annualTourists(m), stay: m.stay, spend: annualSpend(m), fish: m.fish, agri: m.agri, shop: m.shop, sat: m.sat, newInd: m.newInd, budget: S.budget }; }
+
+function endMonth() {
+  run(async () => {
+    if (S.ap > 0) {
+      const i = await choose(null, `行動力がまだ ${S.ap} 残っている。今月を終えますか？`, ["今月を終える", "もう少し動く"]);
+      if (i !== 0) return;
+    }
+    const m = S.m, mi = monthIdx(S.turn);
+    const b = { ...m };
+    // 何もしなくても進むこと
+    m.pop *= 1 - 0.0017;
+    m.kankei *= 0.99;
+    m.idx *= 1 - 0.0033;
+    m.fish -= 0.15; m.agri -= 0.15; m.shop -= 0.15; m.sat -= 0.1;
+    // プロジェクトの効果
+    let furusato = 0;
+    Object.keys(S.projects).forEach((id) => {
+      const p = PROJ[id];
+      applyEff(p.monthly || {}, S.flags.digital && id !== "p_digital" ? 1.1 : 1);
+      furusato += (p.monthly && p.monthly.furusato) || 0;
+      if (p.summer && (mi === 3 || mi === 4)) m.shop += p.summer;
+      if (p.winter && (mi === 8 || mi === 9 || mi === 10)) m.shop += p.winter;
+    });
+    // 関係人口のうち、ごく一部が移り住む
+    m.pop += m.kankei * 0.0003;
+    S.budget += furusato;
+    normalize();
+    const monthTour = (TOURIST_BASE * m.idx / 12) * SEASON[mi];
+    S.hist.push(snapshot());
+
+    let rep = `${dateLabel(S.turn)}が終わった。\n` +
+      `今月の観光客（推計）約${(monthTour / 10000).toFixed(1)}万人　関係人口 ${fmt(m.kankei)}人（${m.kankei - b.kankei >= 0 ? "+" : ""}${fmt(m.kankei - b.kankei)}）\n` +
+      `町の人口 ${fmt(m.pop)}人` + (furusato ? `　ふるさと納税などの寄附 +${furusato}万円` : "");
+    Sound.se("month");
+    await say("月のまとめ", rep);
+
+    if (mi === 11) await yearReport();
+    S.turn++;
+    if (S.turn >= TOTAL_TURNS) { await finale(); return; }
+    // 新しい月
+    S.talked = {}; S.helped = {}; S.posted = {}; S.ap = S.apMax;
+    if (monthIdx(S.turn) === 0) {
+      S.budget += BUDGET_YEAR;
+      await say("浜田みのり", `「新年度になりました。任期${termYear(S.turn)}年目ですね。今年度の活動予算として${BUDGET_YEAR}万円を確保しました」`);
+    }
+    await runEvents();
+  });
+}
+
+async function yearReport() {
+  const y = termYear(S.turn);
+  const startSnap = y === 1 ? { kankei: START.kankei, pop: START.pop, tour: TOURIST_BASE * START.idx } : S.hist[(y - 1) * 12 - 1];
+  const now = snapshot();
+  await say("年度末報告会", `任期${y}年目の報告会が、役場で開かれた。\n` +
+    `関係人口 ${fmt(startSnap.kankei)}人 → ${fmt(now.kankei)}人\n` +
+    `年間観光客（推計） ${(startSnap.tour / 10000).toFixed(0)}万人 → ${(now.tour / 10000).toFixed(0)}万人\n` +
+    `町の人口 ${fmt(startSnap.pop)}人 → ${fmt(now.pop)}人\n動いているプロジェクト ${activeCount()}件　新しい産業 ${now.newInd}件`);
+  const c = activeCount();
+  const line = c === 0 ? "まずは町を歩いて、人と知り合うところからですね。焦らなくて大丈夫です。"
+    : c < 3 ? "動き出したプロジェクトの話、町のあちこちで聞くようになりましたよ。"
+    : "議会でも、あなたの取り組みが話題になっています。町の人の顔つきが変わってきました。";
+  await say("浜田みのり", `「${line}」`);
+}
+
+/* =========================================================
+   イベント
+   ========================================================= */
+async function satoArrives() {
+  S.flags.satoIn = true;
+  await say("浜田みのり", "「そうだ、名古屋のIT企業から、社員研修の場所を探しているという相談が来ています。師崎港観光センターで会ってもらえませんか」");
+  await say(null, "（師崎に「佐藤」さんが現れるようになった）");
+}
+
+async function runEvents() {
+  const mi = monthIdx(S.turn), y = termYear(S.turn);
+  // 決まった時期のイベント
+  if (mi === 1) await evGW();
+  if (mi === 3) await evTaimatsuri();
+  if (mi === 4) await evHeat();
+  if (mi === 5 && Math.random() < 0.6) await evTyphoon();
+  if (mi === 6) await evOnbe();
+  if (mi === 8) await evFugu();
+  if (mi === 9) await say(null, "1月。師崎では左義長祭が開かれ、正月飾りを燃やす火が港を照らした。町の人たちと一年の無事を祈った。");
+  if (S.turn === 7 && !S.flags.satoIn) await satoArrives();
+  // ときどき起きること
+  if (S.turn >= 26 && !S.used.quake && Math.random() < 0.3) { await evQuake(); return; }
+  if (S.turn === 33 && !S.used.quake) { await evQuake(); return; }
+  if (Math.random() < 0.45) {
+    const pool = [
+      { id: "shirasu", w: 2, ok: () => (S.used.shirasu || 0) < 3, f: evShirasu },
+      { id: "aji", w: 2, ok: () => !S.flags.ajiBoom && S.turn >= 4, f: evAji },
+      { id: "tako", w: 1, ok: () => (S.used.tako || 0) < 2, f: evTako },
+      { id: "buzz", w: 2, ok: () => S.posts >= 3 && !S.used.buzz, f: evBuzz },
+      { id: "ryokan", w: 1, ok: () => (S.used.ryokan || 0) < 2, f: evRyokan },
+      { id: "inbound", w: 1, ok: () => S.turn >= 6, f: evInbound },
+      { id: "rina", w: 1, ok: () => !S.used.rina, f: evRina },
+    ].filter((e) => e.ok());
+    const total = pool.reduce((a, e) => a + e.w, 0);
+    let r = Math.random() * total;
+    for (const e of pool) { r -= e.w; if (r <= 0) { await e.f(); break; } }
+  }
+}
+
+async function evGW() {
+  await say("イベント", "ゴールデンウィーク。国道247号は、師崎港へ向かう車で数キロにわたって渋滞している。");
+  if (S.flags.asakatsu) {
+    S.m.sat += 1; S.m.idx += 0.004;
+    await say(null, "朝活ツアーの参加者は、渋滞が始まる前に朝市へ着いていた。「朝のうちに来れば、こんなに快適なのか」と好評だ。");
+    return;
+  }
+  const i = await choose(null, "どうする？", ["渋滞情報と臨時駐車場をSNSで発信する（予算10万円）", "様子を見る"]);
+  if (i === 0 && S.budget >= 10) { S.budget -= 10; S.m.sat += 0.8; S.m.idx += 0.003; await say(null, "臨時駐車場の場所と空き状況を発信した。少しだけ流れがよくなった。"); await gainExp(5); }
+  else { S.m.sat -= 1; S.m.idx -= 0.003; await say(null, "渋滞に疲れて、島へ渡るのをあきらめた車もあったようだ。"); }
+  normalize();
+}
+async function evTaimatsuri() {
+  discover("c_taimatsuri", true);
+  await say("イベント", "7月。豊浜鯛まつり。竹と木と布でつくった全長10mを超える鯛が、威勢のいい掛け声とともに町を練り歩く。");
+  const i = await choose(null, "どうする？", ["担ぎ手として参加する（今月の行動力-1）", "祭りの様子を写真で発信する"]);
+  if (i === 0) { S.ap = Math.max(0, S.ap - 1); addTrust("gen", 1); S.met.gen = true; S.m.kankei += 50; S.m.sat += 0.5; await say("源さん", "「お前さん、なかなか腰が入っとったぞ。来年も来いよ」"); }
+  else { const g = 80 + 30 * S.skills.post; S.m.kankei += g; await say(null, `海に入っていく鯛の写真が広く共有された。関係人口 +${g}人。`); }
+  await gainExp(5);
+}
+async function evHeat() {
+  await say("イベント", "8月。最高気温は37℃。日中の浜は、暑さで人がまばらだ。");
+  if (S.projects.p_sunset) { S.m.idx += 0.005; await say(null, "夕方の千鳥ヶ浜サンセット・マルシェは、涼しくなった時間ににぎわった。昼を避けた夏の楽しみ方が広がっている。"); return; }
+  const i = await choose(null, "どうする？", ["朝と夕方のイベントを提案する（予算20万円）", "いつもどおり"]);
+  if (i === 0 && S.budget >= 20) { S.budget -= 20; S.m.idx += 0.003; S.m.sat += 0.5; await say(null, "朝の浜ヨガと夕方の夜店を試した。暑さを避けた時間に人が戻ってきた。"); await gainExp(5); }
+  else { S.m.idx -= 0.005; await say(null, "海水浴客は去年より少なかったようだ。"); }
+  normalize();
+}
+async function evTyphoon() {
+  await say("イベント", "9月。台風が知多半島をかすめた。漁は数日間休みになり、港の片付けに追われた。");
+  S.m.fish -= 2; S.m.shop -= 1;
+  Sound.se("bad");
+  if (S.flags.bousai) { S.m.sat += 1; await say(null, "観光センターの避難案内が役立ち、島から戻れなくなった観光客も落ち着いて過ごせた。"); }
+  normalize();
+}
+async function evOnbe() {
+  discover("c_onbedai", true);
+  await say("イベント", "10月12日。篠島でおんべ鯛奉納祭。塩漬けにした鯛を伊勢神宮へ納める、千年以上続く祭りだ。\n同じころ、内海ではみかん狩りが始まった。");
+  const i = await choose(null, "どうする？", ["島へ渡って祭りを手伝う（今月の行動力-2）", "祭りの様子を発信する"]);
+  if (i === 0) { S.ap = Math.max(0, S.ap - 2); addTrust("miya", 2); S.met.miya = true; S.m.kankei += 40; S.m.sat += 0.5; await say("宮さん", "「よう手伝ってくれた。神宮さんへ納める鯛は、島の誇りだでな」"); }
+  else { const g = 60 + 25 * S.skills.post; S.m.kankei += g; await say(null, `伊勢と篠島の千年のつながりに、多くの人が驚いていた。関係人口 +${g}人。`); }
+  await gainExp(5);
+}
+async function evFugu() {
+  await say("イベント", "12月。トラフグの季節。日間賀島の宿では、てっさやてっちりが並び始めた。");
+  if (S.projects.p_fuguonsen) { S.m.stay += 0.005; await say(null, "「冬のフグと温泉の島めぐり」は予約でいっぱいだ。冬なのに、山海の温泉宿にも灯りがともっている。"); normalize(); }
+}
+async function evShirasu() {
+  S.used.shirasu = (S.used.shirasu || 0) + 1;
+  discover("i_shirasu", true);
+  S.m.fish -= 3; normalize();
+  Sound.se("bad");
+  await say("イベント", "今年はシラスの不漁が続いている。親魚のカタクチイワシが少ないらしい。");
+  await say("大橋 健", S.projects.p_shirasu ? "「規格外も含めて全部使う仕組みにしておいてよかった。なんとか持ちこたえてます」" : "「このままだと、加工場を続けられるか……。何か手を打たないと」");
+  if (S.projects.p_shirasu) { S.m.fish += 1.5; normalize(); }
+}
+async function evAji() {
+  S.flags.ajiBoom = true; S.m.fish += 2; normalize();
+  await say("イベント", "港がざわついている。今年はアジが驚くほど獲れているらしい。");
+  await say("源さん", "「アジがこんなに獲れるのは久しぶりだわ。こいつを名物にできりゃあな」");
+  await say(null, "（企画に「南知多アジ ブランド化」が加わった）");
+}
+async function evTako() {
+  S.used.tako = (S.used.tako || 0) + 1;
+  discover("i_tako", true);
+  S.m.fish -= 1.5; normalize();
+  await say("イベント", "日間賀島の漁師から、今年もタコが少ないという声が届いた。");
+  if (S.projects.p_takotsubo) { S.m.fish += 1; normalize(); await say("島田たける", "「放流した稚ダコ、少しずつ育ってるって漁師さんが言ってた。続けよう」"); }
+}
+async function evBuzz() {
+  S.used.buzz = true;
+  const g = 300 + 100 * S.skills.post; S.m.kankei += g;
+  Sound.se("levelup");
+  await say("イベント", `あなたの投稿が、名古屋のテレビ局の目にとまり、夕方の番組で南知多が特集された！\n関係人口 +${g}人。`);
+}
+async function evRyokan() {
+  S.used.ryokan = (S.used.ryokan || 0) + 1;
+  S.m.shop -= 2; S.m.sat -= 1;
+  Sound.se("bad");
+  await say("イベント", "内海の老舗の宿が、建物の老朽化と後継者不足で廃業することになった。");
+  if (S.projects.p_kominka) { S.m.shop += 1.5; await say(NPC.nagi.name,"「建物を古民家ステイの仲間として生かせないか、持ち主さんと話してみます」"); }
+  normalize();
+}
+async function evInbound() {
+  S.m.idx += 0.004; normalize();
+  await say("イベント", "セントレアから車で30分。海外からの旅行者が、島のタコ料理を目当てにやってきた。");
+  if (S.found.c_center !== undefined) { S.m.kankei += 30; await say(null, "新しい観光センターの多言語案内が役に立った。"); }
+}
+async function evRina() {
+  S.used.rina = true;
+  discover("i_jisshusei", true);
+  S.met.rina = true;
+  await say("イベント", "豊浜の港で、インドネシアから来たリナさんに声をかけられた。");
+  await say("リナ", "「すみません、町の祭り、わたしたちも参加していいですか？ どこに聞けばいいか、わからなくて」");
+  const i = await choose(null, "どうする？", ["区長さんにつないであげる", "今は忙しいと断る"]);
+  if (i === 0) { addTrust("rina", 1); S.m.sat += 0.5; await say(null, "区長さんは「人手が足りんで大歓迎だわ」と笑った。"); }
+  else { S.m.sat -= 0.5; }
+  normalize();
+}
+async function evQuake() {
+  S.used.quake = true;
+  Sound.se("bad");
+  await say("緊急", "南海トラフ地震臨時情報（巨大地震注意）が発表された。大きな地震への備えを再確認するよう呼びかけが出ている。");
+  if (S.flags.bousai) {
+    S.m.sat += 1.5; S.m.idx -= 0.002;
+    await say(null, "観光センターでの避難訓練に参加した観光客が「この町は備えができている」と発信した。キャンセルは最小限で済んだ。");
+  } else {
+    S.m.sat -= 2; S.m.idx -= 0.015;
+    await say(null, "観光客から「津波が来たらどこへ逃げればいいのか」という問い合わせが相次ぎ、予約のキャンセルが続いた。");
+    await say("浜田みのり", "「来た人を守る仕組み、もっと早く整えておくべきでした……」");
+  }
+  normalize();
+}
+
+/* =========================================================
+   エンディング
+   ========================================================= */
+function baseline() {
+  const n = TOTAL_TURNS;
+  const m = { pop: START.pop * Math.pow(1 - 0.0017, n), kankei: START.kankei * Math.pow(0.99, n), idx: START.idx * Math.pow(1 - 0.0033, n), stay: START.stay,
+    fish: START.fish - 0.15 * n, agri: START.agri - 0.15 * n, shop: START.shop - 0.15 * n, sat: START.sat - 0.1 * n, newInd: 0 };
+  m.pop += 0; // 何もしない場合は関係人口からの移住も小さい
+  return m;
+}
+function score() {
+  const m = S.m, b = baseline();
+  const ind = (m.fish + m.agri + m.shop) / 3, indB = (b.fish + b.agri + b.shop) / 3;
+  const parts = [
+    ["関係人口", clamp((m.kankei - b.kankei) / 350, 0, 30), 30],
+    ["観光消費", clamp((annualSpend(m) / annualSpend(b) - 1) * 30, 0, 20), 20],
+    ["既存産業", clamp((ind - indB) / 1.5, 0, 20), 20],
+    ["新しい産業", clamp(m.newInd * 5, 0, 15), 15],
+    ["人口", clamp((m.pop - b.pop) / 15, 0, 10), 10],
+    ["町民の満足度", clamp((m.sat - b.sat) / 2, 0, 5), 5],
+  ];
+  const total = Math.round(parts.reduce((a, p) => a + p[1], 0));
+  return { parts, total, b };
+}
+async function finale() {
+  S.over = true; save(); addRecord();
+  Sound.bgm("ending");
+  await say(null, `${dateLabel(TOTAL_TURNS - 1)}。3年間の任期が終わった。\n内海駅のホームで、来たときと同じ潮のにおいがした。`);
+  openSheet("ending");
+}
+
+/* =========================================================
+   描画
+   ========================================================= */
+function buildMap() {
+  const svg = $("#map");
+  const land = "M150,0 L432,0 L446,58 L426,128 L438,198 L404,268 L384,326 L336,382 L300,398 L268,380 L252,332 L226,282 L198,222 L170,152 L150,84 Z";
+  let waves = "";
+  for (let y = 30; y < 520; y += 34) waves += `<path d="M0,${y} q15,-6 30,0 t30,0 t30,0" fill="none" stroke="var(--sea-line)" stroke-width="1.2" transform="translate(${(y * 7) % 90 - 40},0)"/>`;
+  let wavesR = "";
+  for (let y = 40; y < 520; y += 38) wavesR += `<path d="M470,${y} q15,-6 30,0 t30,0 t30,0" fill="none" stroke="var(--sea-line)" stroke-width="1.2" transform="translate(${(y * 5) % 60 - 30},0)"/>`;
+  svg.innerHTML = `
+    <rect width="600" height="520" fill="var(--sea)"/>
+    ${waves}${wavesR}
+    <path d="${land}" fill="var(--land)" stroke="var(--land-edge)" stroke-width="3" stroke-linejoin="round"/>
+    <ellipse cx="478" cy="352" rx="30" ry="15" transform="rotate(-18 478 352)" fill="var(--land)" stroke="var(--land-edge)" stroke-width="3"/>
+    <ellipse cx="436" cy="448" rx="33" ry="17" transform="rotate(-8 436 448)" fill="var(--land)" stroke="var(--land-edge)" stroke-width="3"/>
+    <path d="M302,372 Q390,350 478,352" fill="none" stroke="var(--ink-soft)" stroke-width="1.6" stroke-dasharray="5 5"/>
+    <path d="M302,372 Q360,430 436,448" fill="none" stroke="var(--ink-soft)" stroke-width="1.6" stroke-dasharray="5 5"/>
+    <path d="M478,352 Q470,400 436,448" fill="none" stroke="var(--ink-soft)" stroke-width="1.2" stroke-dasharray="2 6"/>
+    <path d="M178,40 Q190,140 214,186 Q232,236 252,272 Q270,330 302,372" fill="none" stroke="var(--land-edge)" stroke-width="2" stroke-dasharray="1 5" stroke-linecap="round"/>
+    <text x="40" y="300" font-family="var(--f-pixel)" font-size="20" fill="var(--ink-soft)" letter-spacing="6">伊勢湾</text>
+    <text x="500" y="180" font-family="var(--f-pixel)" font-size="20" fill="var(--ink-soft)" letter-spacing="6">三河湾</text>
+    <text x="290" y="22" font-size="11" fill="var(--ink-soft)" text-anchor="middle">↑ 美浜町・名古屋方面</text>
+    <text x="180" y="97" font-size="10" fill="var(--ink-soft)" text-anchor="end">名鉄 内海駅</text>
+    <text x="196" y="250" font-size="10" fill="var(--ink-soft)" transform="rotate(62 196 250)">国道247号</text>
+    <text x="368" y="420" font-size="10" fill="var(--ink-soft)">島への航路</text>
+    <g transform="translate(548,470)"><circle r="18" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/><path d="M0,-14 L5,4 L0,0 L-5,4 Z" fill="var(--tai)"/><text y="14" font-size="9" text-anchor="middle" fill="var(--ink)">N</text></g>
+    <g id="nodes"></g>`;
+  const g = $("#nodes", svg);
+  Object.entries(DIST).forEach(([id, d]) => {
+    const n = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    n.setAttribute("class", "node" + (d.island ? " isle" : ""));
+    n.setAttribute("data-id", id); n.setAttribute("tabindex", "0"); n.setAttribute("role", "button");
+    n.setAttribute("aria-label", d.name);
+    const below = d.island || id === "morozaki";
+    n.innerHTML = `<circle class="ring" cx="${d.x}" cy="${d.y}" r="14"/><circle class="dot" cx="${d.x}" cy="${d.y}" r="11"/>
+      <text class="nm" x="${d.x}" y="${below ? d.y + 30 : d.y - 18}" text-anchor="middle">${d.name}</text>
+      <text class="pg" x="${d.x}" y="${below ? d.y + 43 : d.y + 26}" text-anchor="middle"></text>`;
+    n.addEventListener("click", () => moveTo(id));
+    n.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); moveTo(id); } });
+    g.appendChild(n);
+  });
+}
+
+function render() {
+  if (!S) return;
+  Sound.bgm(S.over ? "ending" : DIST[S.loc].island ? "island" : "field");
+  // 上部
+  const pips = Array.from({ length: S.apMax }, (_, i) => `<span class="pip${i < S.ap ? " on" : ""}"></span>`).join("");
+  $("#status").innerHTML = `
+    <div class="stat"><img class="pface" src="${faceURL(S.avatar || "pa", "smile")}" style="background:${charBg(S.avatar || "pa")}" alt=""><span class="v">${esc(S.name)}</span></div>
+    <div class="stat"><span class="k">${S.over ? "任期終了" : "任期" + termYear(S.turn) + "年目"}</span><span class="v">${dateLabel(Math.min(S.turn, TOTAL_TURNS - 1))}</span></div>
+    <div class="stat"><span class="k">行動力</span><span class="pips" aria-label="行動力 ${S.ap}/${S.apMax}">${pips}</span></div>
+    <div class="stat"><span class="k">予算</span><span class="v">${fmt(S.budget)}万円</span></div>
+    <div class="stat"><span class="k">関係人口</span><span class="v">${fmt(S.m.kankei)}</span></div>
+    <div class="stat"><span class="k">Lv</span><span class="v">${S.lv}</span></div>`;
+  // 地図
+  document.querySelectorAll(".node").forEach((n) => {
+    const id = n.dataset.id, d = DIST[id];
+    n.classList.toggle("here", id === S.loc);
+    const f = d.cards.filter((c) => S.found[c] !== undefined).length;
+    n.querySelector(".pg").textContent = id === S.loc ? "現在地" : `発見 ${f}/${d.cards.length}`;
+  });
+  // パネル
+  const d = DIST[S.loc];
+  const found = d.cards.filter((c) => S.found[c] !== undefined).length;
+  const charmN = d.cards.filter((c) => S.found[c] !== undefined && CARDS[c].t === "charm").length;
+  const people = d.people.filter(npcAvail).map((id) => {
+    const p = NPC[id];
+    return `<button class="person${S.met[id] ? "" : " new"}" data-npc="${id}"${busy || S.over ? " disabled" : ""}>
+      <img class="mini" src="${faceURL(id, baseMouth(id), "open", !S.met[id])}" style="background:${charBg(id)}" alt="">
+      <span class="pinfo"><span class="pn">${esc(S.met[id] ? p.name : "？？？")}</span><span class="pr">${esc(p.role)}</span></span><span class="hearts" aria-label="信頼 ${trust(id)}">${hearts(trust(id))}</span></button>`;
+  }).join("");
+  const dis = busy || S.over;
+  const moves = Object.keys(DIST).filter((id) => id !== S.loc).map((id) => {
+    const c = moveCost(S.loc, id);
+    return `<button class="mv" data-mv="${id}"${dis || S.ap < c ? " disabled" : ""}>${DIST[id].name}<span class="cost">${"●".repeat(c)}</span></button>`;
+  }).join("");
+  const exploreLeft = d.cards.some((c) => S.found[c] === undefined);
+  $("#panel").innerHTML = `
+    <div class="scene-wrap"><canvas class="scene" id="sceneCv" aria-hidden="true"></canvas><span class="season">${{ spring: "春", summer: "夏", autumn: "秋", winter: "冬" }[seasonOf(monthIdx(Math.min(S.turn, TOTAL_TURNS - 1)))]}・${calMonth(Math.min(S.turn, TOTAL_TURNS - 1))}月</span></div>
+    <div class="loc-h"><h2>${d.name}</h2><span class="kana">${d.kana}</span><span class="found">発見 ${found}/${d.cards.length}</span></div>
+    <p class="loc-desc">${esc(d.desc)}</p>
+    <div><p class="sec-label">ここで会える人</p><div class="people">${people || '<p class="loc-desc">今は誰もいないようだ。</p>'}</div></div>
+    <div><p class="sec-label">行動</p><div class="acts">
+      <button class="act" id="aExplore"${dis || S.ap < 1 ? " disabled" : ""}>${exploreLeft ? "歩いて探す" : "町を歩く"}<span class="cost">●</span></button>
+      <button class="act" id="aPost"${dis || S.ap < 1 || !charmN || S.posted[S.loc] ? " disabled" : ""}>${S.posted[S.loc] ? "発信済み" : "魅力を発信"}<span class="cost">●</span></button>
+      <button class="act" id="aProj"${S.over ? " disabled" : ""}>企画を開く<span class="cost">●●</span></button>
+    </div></div>
+    <div><p class="sec-label">移動（●＝行動力）</p><div class="moves">${moves}</div></div>
+    <button class="endturn" id="aEnd"${dis ? " disabled" : ""}>今月を終える ▶</button>`;
+  paintScene($("#sceneCv"), S.loc, monthIdx(Math.min(S.turn, TOTAL_TURNS - 1)));
+  $("#panel").querySelectorAll("[data-npc]").forEach((b) => b.addEventListener("click", () => npcMenu(b.dataset.npc)));
+  $("#panel").querySelectorAll("[data-mv]").forEach((b) => b.addEventListener("click", () => moveTo(b.dataset.mv)));
+  $("#aExplore").onclick = explore; $("#aPost").onclick = post; $("#aEnd").onclick = endMonth;
+  $("#aProj").onclick = () => openSheet("proj");
+}
+
+/* ---------- シート ---------- */
+let sheetKind = null;
+function openSheet(kind) {
+  if (!S && !["help", "title", "save", "rank"].includes(kind)) return;
+  if (busy && kind !== "help" && kind !== "ending") return;
+  sheetKind = kind;
+  const box = $("#sheetIn");
+  box.innerHTML = (kind === "title" || kind === "ending" ? "" : `<button class="close" id="closeSheet">閉じる</button>`) + sheetHTML(kind);
+  $("#sheet").hidden = false;
+  const c = $("#closeSheet"); if (c) { c.onclick = closeSheet; c.focus({ preventScroll: true }); }
+  bindSheet(kind);
+  box.scrollTop = 0; $("#sheet").scrollTop = 0;
+}
+function closeSheet() { $("#sheet").hidden = true; sheetKind = null; if (!S) openSheet("title"); }
+
+function spark(key) {
+  const vals = [START_SNAP()[key], ...S.hist.map((h) => h[key])];
+  if (vals.length < 2) return "";
+  const min = Math.min(...vals), max = Math.max(...vals), span = max - min || 1;
+  const pts = vals.map((v, i) => `${(i / (vals.length - 1)) * 200},${26 - ((v - min) / span) * 22}`).join(" ");
+  const last = pts.split(" ").pop().split(",");
+  return `<svg viewBox="0 0 204 30" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="var(--nori)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="${last[0]}" cy="${last[1]}" r="3" fill="var(--tai)"/></svg>`;
+}
+function START_SNAP() { const m = START; return { pop: m.pop, kankei: m.kankei, tour: annualTourists(m), stay: m.stay, spend: annualSpend(m), fish: m.fish, agri: m.agri, shop: m.shop, sat: m.sat, newInd: 0, budget: BUDGET_YEAR }; }
+
+function sheetHTML(kind) {
+  if (kind === "title") return titleHTML();
+  if (kind === "help") return helpHTML();
+  if (kind === "save") return saveHTML();
+  if (kind === "rank") return rankHTML();
+  if (kind === "ending") return endingHTML();
+  if (kind === "data") {
+    const m = S.m, st = START_SNAP(), now = snapshot();
+    const row = (k, label, val, startV, unit, src, dec = 0) => {
+      let diff = now[k] - startV;
+      if (k === "spend") { diff /= 1e8; dec = 1; unit = "億円"; }
+      if (k === "tour") { diff /= 1e4; dec = 1; unit = "万人"; }
+      const dtxt = Math.abs(diff) < (dec ? 0.05 : 0.5) ? "±0" : `${diff > 0 ? "+" : ""}${dec ? diff.toFixed(dec) : fmt(diff)}`;
+      return `<div class="metric"><span class="mk">${label}</span><span class="mv2">${val}</span><span class="md ${diff > 0 ? "up" : diff < 0 ? "down" : ""}">開始時から ${dtxt}${unit}</span>${spark(k)}${src ? `<span class="src">${src}</span>` : ""}</div>`;
+    };
+    return `<h3>町のデータ</h3><p class="lead">${dateLabel(Math.min(S.turn, TOTAL_TURNS - 1))}時点。線グラフは毎月の推移。</p>
+      <div class="metrics">
+        ${row("pop", "町の人口", fmt(m.pop) + "人", st.pop, "人", "開始値は2025年3月末の15,455人から推計")}
+        ${row("kankei", "関係人口", fmt(m.kankei) + "人", st.kankei, "人", "何度も町に関わる町外の人（ゲーム内の推計）")}
+        ${row("tour", "年間観光客（推計）", (annualTourists(m) / 10000).toFixed(1) + "万人", st.tour, "人", "開始値は2024年実績179.2万人")}
+        <div class="metric"><span class="mk">宿泊する人の割合</span><span class="mv2">${(m.stay * 100).toFixed(1)}%</span><span class="md ${m.stay > st.stay ? "up" : m.stay < st.stay ? "down" : ""}">開始時から ${((m.stay - st.stay) * 100 >= 0 ? "+" : "")}${((m.stay - st.stay) * 100).toFixed(1)}pt</span>${spark("stay")}<span class="src">島の観光客は57%が日帰り（地域再生計画）</span></div>
+        ${row("spend", "年間観光消費額（推計）", (annualSpend(m) / 1e8).toFixed(1) + "億円", st.spend, "円", "日帰り3,000円・宿泊18,000円で試算")}
+        ${row("fish", "漁業の元気", m.fish.toFixed(1), st.fish, "", "開始時=100", 1)}
+        ${row("agri", "農業の元気", m.agri.toFixed(1), st.agri, "", "開始時=100", 1)}
+        ${row("shop", "観光・商業の元気", m.shop.toFixed(1), st.shop, "", "開始時=100", 1)}
+        ${row("sat", "町民の満足度", m.sat.toFixed(1), st.sat, "", "0〜100", 1)}
+        ${row("newInd", "生まれた新しい産業", m.newInd + "件", 0, "件", "")}
+      </div>
+      <p class="note">何もしなくても、人口は年2%ほど、観光客は年4%ほど減っていきます（2020〜2024年度の町の実績をもとに設定）。数字はゲーム用の推計で、実際の統計ではありません。</p>`;
+  }
+  if (kind === "note") {
+    const total = Object.keys(CARDS).length, got = Object.keys(S.found).length;
+    let h = `<h3>発見ノート</h3><p class="lead">見つけた魅力と課題 ${got}/${total}。地区を歩いたり、人と話したりすると増えていきます。</p>`;
+    Object.entries(DIST).forEach(([id, d]) => {
+      const f = d.cards.filter((c) => S.found[c] !== undefined).length;
+      h += `<div class="dhead">${d.name}<small>${f}/${d.cards.length}</small></div><div class="cards">` +
+        d.cards.map((c) => {
+          const k = CARDS[c];
+          if (S.found[c] === undefined) return `<div class="card unk"><div class="ct"><span class="badge">？</span>まだ見つけていない</div></div>`;
+          return `<div class="card"><div class="ct"><span class="badge ${k.t}">${k.t === "charm" ? "魅力" : "課題"}</span>${esc(k.name)}</div><p>${esc(k.text)}</p></div>`;
+        }).join("") + `</div>`;
+    });
+    return h;
+  }
+  if (kind === "people") {
+    const list = Object.entries(NPC).filter(([id]) => npcAvail(id)).map(([id, p]) => {
+      const met = S.met[id], pf = PROFILE[id];
+      return `<div class="pp"><img src="${faceURL(id, baseMouth(id), "open", !met)}" style="background:${charBg(id)}" alt="">
+        <div><b>${esc(met ? `${p.name}（${pf.age}歳）` : "？？？")}</b><br><span class="hearts">${hearts(trust(id))}</span></div>
+        <p>${esc(p.role)}／${DIST[p.d].name}</p>
+        ${met ? `<p class="pfull">${esc(pf.profile)}</p><p class="pfull">好きなもの：${esc(pf.like)}</p><p class="pfull">「${esc(p.lines[Math.max(0, trust(id) - 1)])}」</p>` : `<p class="pfull">まだ会っていない。${DIST[p.d].name}で話しかけてみよう。</p>`}</div>`;
+    }).join("");
+    return `<h3>人脈</h3><p class="lead">信頼（♥）は、話すと1、手伝うと1上がります。どちらも同じ人には月1回まで。人物はすべて架空です。</p><div class="ppl">${list}</div>`;
+  }
+  if (kind === "proj") {
+    const ids = Object.keys(PROJ);
+    const active = ids.filter((id) => S.projects[id]);
+    const vis = ids.filter((id) => !S.projects[id] && projVisible(id));
+    const hidden = ids.filter((id) => !S.projects[id] && !projVisible(id));
+    const card = (id) => {
+      const p = PROJ[id], on = !!S.projects[id], cs = canStart(id);
+      const rs = reqStatus(id);
+      const eff = [];
+      const mo = p.monthly || {}, o = p.once || {};
+      if (mo.kankei) eff.push(`関係人口 毎月+${mo.kankei}`); if (mo.pop) eff.push(`移住 毎月+${mo.pop}人`);
+      if (mo.fish) eff.push("漁業↑"); if (mo.agri) eff.push("農業↑"); if (mo.shop) eff.push("観光・商業↑"); if (mo.sat) eff.push("満足度↑");
+      if (mo.furusato) eff.push(`寄附 毎月+${mo.furusato}万円`); if (o.idx) eff.push(`観光客+${o.idx}%`); if (o.stay) eff.push(`宿泊の割合+${o.stay}pt`);
+      if (p.newInd) eff.push(`新しい産業：${p.newInd}`);
+      return `<div class="proj${on ? " on" : cs.ok ? " ready" : ""}">
+        <div class="pt">${esc(p.name)}<span class="pa">${esc(p.area)}</span></div>
+        <div class="side">${on ? `<span class="tagon">実施中（${dateLabel(S.projects[id].start)}〜）</span>` :
+          `<span class="price">${projCost(p)}万円 ●●</span><button class="go" data-start="${id}"${cs.ok && !busy ? "" : " disabled"}>${cs.ok ? "始める" : cs.why}</button>`}</div>
+        <p class="pd">${esc(p.desc)}</p>
+        ${on ? "" : `<div class="req">${rs.map((r) => `<span class="${r.ok ? "ok" : ""}">${r.ok ? "✓ " : ""}${esc(r.label)}</span>`).join("")}</div>`}
+        <div class="eff">${eff.join("　")}</div></div>`;
+    };
+    return `<h3>企画</h3><p class="lead">必要な魅力・課題を見つけ、地元の人の信頼を得ると、プロジェクトを始められます。始めるには予算と行動力2が必要です。予算 ${fmt(S.budget)}万円／行動力 ${S.ap}</p>
+      <div class="plist">${active.map(card).join("")}${vis.map(card).join("")}</div>
+      ${hidden.length ? `<p class="note">まだ見えていないプロジェクトが ${hidden.length} 件あります。町を歩いて、人と話してみよう。</p>` : ""}`;
+  }
+  return "";
+}
+
+function titleHTML() {
+  const sv = load();
+  const hasSave = sv && sv.started && !sv.over;
+  return `<div class="title-in">
+    <p class="sec-label">地域おこしロールプレイングゲーム</p>
+    <h1 class="bigtitle">つなぐ<span>南知多</span></h1>
+    <p class="sub">愛知県・知多半島の先端、南知多町。あなたは地域おこし協力隊として3年間、この町で暮らす。<br>町の隠れた魅力と課題を見つけ、町に関わる人を増やし、海と畑の仕事を元気にして、新しい仕事を生み出そう。</p>
+    <div class="goals">
+      <div class="goal"><b>見つける</b><span>8つの地区を歩き、41の魅力と課題を発見</span></div>
+      <div class="goal"><b>つながる</b><span>漁師、農家、島の人たちと信頼を育てる</span></div>
+      <div class="goal"><b>生み出す</b><span>17のプロジェクトで関係人口と新しい産業を</span></div>
+    </div>
+    <div class="field"><label for="playerName">あなたの名前</label><input id="playerName" maxlength="10" value="${esc(sv && sv.name ? sv.name : "みなみ")}"></div>
+    <p class="sec-label">あなたの姿</p>
+    <div class="avs" role="group" aria-label="あなたの姿">${AVATARS.map(([id, label]) => `<button class="av" data-av="${id}" aria-pressed="${id === titleAv}"><img src="${faceURL(id, "smile")}" style="background:${charBg(id)}" alt="">${label}</button>`).join("")}</div>
+    <div style="height:14px"></div>
     <div class="row">
-      <button class="btn small" data-a="top" data-v="shirasu" ${!p||p.tops.includes('shirasu')?'disabled':''}><span class="chip" style="background:#f3efe4"></span>しらすをのせる</button>
-      <button class="btn small" data-a="top" data-v="ooba" ${!p||p.tops.includes('ooba')?'disabled':''}><span class="chip" style="background:#3f9a3a"></span>大葉をのせる</button>
+      <button class="go" id="btnNew">はじめから</button>
+      ${hasSave ? `<button class="mbtn" id="btnCont">つづきから（${dateLabel(sv.turn)}）</button>` : ""}
+      <button class="mbtn" id="btnLoadSave">セーブ・記録</button>
+      ${RANKING_URL ? `<button class="mbtn" id="btnShowRank">みんなのランキング</button>` : ""}
+      <button class="mbtn" id="btnHelp">遊び方</button>
+      <button class="mbtn" data-sound aria-pressed="${Sound.isOn()}">音 ${Sound.isOn() ? "ON" : "OFF"}</button>
     </div>
-    <div class="row"><button class="btn go small" style="flex:1" data-a="plate-serve" ${!p?'disabled':''}>カウンターへ</button><button class="btn small warn" data-a="plate-clear" ${!p?'disabled':''}>捨てる</button></div>
-    ${mode==='easy'?'<div class="recipe-card"><b>焼きそば</b><ol><li>焼きそばを焼く</li><li>しらすと大葉を入れる</li><li>塩だれ・だし塩で味をととのえる</li><li>器に盛る</li><li>仕上げにしらすと大葉をのせる</li></ol></div>':''}`;
-  const L=S.soup;
-  $('#soup-area').innerHTML=`<h2>たまごスープ <small>カップに作る</small></h2>
-    <div class="vis">${cupSVG(L)}</div>
-    <div class="row">
-      <button class="btn small" data-a="soup" data-v="pour" ${L.includes('pour')?'disabled':''}><span class="chip" style="background:#f2c94c"></span>スープをそそぐ</button>
-      <button class="btn small" data-a="soup" data-v="negi" ${L.includes('negi')?'disabled':''}><span class="chip" style="background:#5bb04b"></span>ねぎ</button>
-      <button class="btn small" data-a="soup" data-v="shirasu" ${L.includes('shirasu')?'disabled':''}><span class="chip" style="background:#f3efe4"></span>しらす</button>
-    </div>
-    <div class="row"><button class="btn go small" style="flex:1" data-a="soup-serve" ${!L.length?'disabled':''}>カウンターへ</button><button class="btn small warn" data-a="soup-clear" ${!L.length?'disabled':''}>作り直す</button></div>
-    ${mode==='easy'?'<div class="recipe-card"><b>スープ</b><ol><li>たまごスープをカップにそそぐ</li><li>ねぎとしらすをのせる</li></ol></div>':''}`;
+    <p class="fine">BGMと効果音が鳴ります。音は「音 ON／OFF」ボタンでいつでも切り替えられます。</p>
+    <p class="fine">登場する地名・施設・名物・統計は、2026年10月時点の公開情報（データブック南知多 令和7年度版、内閣府の地域再生計画、愛知県観光サイト Aichi Now など）にもとづきます。店舗や商品は固有の名称を使わずに表現しています。人物と企業「ミナトテック」は架空で、実在の店舗・団体とは関係ありません。</p>
+  </div>`;
 }
-
-/* ---------- overlays ---------- */
-function bestScore(){try{return +localStorage.getItem('shirasu-kc-best')||0}catch(e){return 0}}
-function saveBest(v){try{localStorage.setItem('shirasu-kc-best',String(v))}catch(e){}}
-function endGame(why){
-  if(S.over)return;S.over=true;S.running=false;syncBgm();
-  const best=bestScore(),isBest=S.money>best;if(isBest)saveBest(S.money);
-  const rank=rankOf(S.money);
-  const comment={S:'行列のできるキッチンカー！',A:'手際のいい調理でした',B:'なかなかの売れ行き',C:'まずはレシピを覚えよう'}[rank];
-  $('#result').innerHTML=`<h2>${{time:'本日の営業終了',quit:'途中で閉店しました',rep:'評判が下がって閉店…'}[why]}</h2>
-    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div class="rank">${rank}</div><div><b style="font-size:18px">${comment}</b><br><small>${mode==='easy'?'やさしい':'ふつう'}モード${isBest?'・自己ベスト更新！':''}</small></div></div>
-    <div class="result-grid">
-      <div><span>売上</span><strong>${S.money.toLocaleString()}円</strong></div>
-      <div><span>提供した品</span><strong>${S.sold}品</strong></div>
-      <div><span>満足して帰ったお客さん</span><strong>${S.happy}人</strong></div>
-      <div><span>待たせて帰したお客さん</span><strong>${S.angry}人</strong></div>
-      <div><span>作り方ちがい</span><strong>${S.fails}品</strong></div>
-      <div><span>こがした食材</span><strong>${S.burnt}個</strong></div>
-    </div>
-    ${RANKING_URL?`<div class="rankbox">
-      <b>みんなのランキングに参加する（${mode==='easy'?'やさしい':'ふつう'}部門）</b>
-      <div class="row"><input id="rank-nick" maxlength="12" placeholder="ニックネーム（12文字まで）" value="${esc(readKey('toriyons-nick')||'')}" aria-label="ニックネーム"><button class="btn go" data-a="rank-send" id="rank-send">ランキングに送る</button></div>
-      <p class="note" id="rank-msg" role="status">送るのはニックネームと結果だけです。本名は入れないでください。</p>
-    </div>`:''}
-    <div class="choices"><button class="btn go" data-a="start" data-v="${mode}">もう一度</button><button class="btn" data-a="title">タイトルへ</button>${RANKING_URL?'<button class="btn" data-a="rank-open">みんなのランキング</button>':''}</div>`;
-  $('#ov-result').hidden=false;beep(523,.1);beep(659,.1);beep(784,.2);
+function helpHTML() {
+  return `<div class="help"><h3>遊び方</h3><p class="lead">任期は2026年4月から2029年3月までの36か月。毎月の行動力を使って町を動かします。</p>
+    <h4>1か月の流れ</h4><ul>
+      <li><b>歩いて探す</b>（●1）…今いる地区で、隠れた魅力か課題を1つ見つける。</li>
+      <li><b>人と話す</b>（●1）…信頼が1上がる。話の中から魅力や課題がわかることも。</li>
+      <li><b>手伝う</b>（●●2）…信頼が1上がり、漁業や商業など町の元気も少し上がる。</li>
+      <li><b>魅力を発信</b>（●1）…見つけた魅力をSNSで発信し、関係人口を増やす。各地区で月1回。</li>
+      <li><b>移動</b>…陸の地区どうしは●1。島へは師崎港から●1、ほかの地区からは●2。</li>
+      <li><b>今月を終える</b>…町の数字が動き、季節のイベントが起きる。</li></ul>
+    <h4>音</h4><p>港町と島で曲が変わり、発見やレベルアップのときは効果音が鳴ります。上のメニューの「音 ON／OFF」で切り替えられます。</p>
+    <h4>プロジェクト</h4><p>必要な「魅力・課題」と「地元の人の信頼」がそろうと、「企画」から始められます（予算と行動力●●が必要）。始めたプロジェクトは毎月、関係人口や産業に効き続けます。予算は毎年4月に300万円（ふるさと納税につながるプロジェクトを動かすと、毎月少しずつ増えます）。全部はできないので、どれを選ぶかが腕の見せどころです。</p>
+    <h4>何もしないとどうなる？</h4><p>町の実績をもとに、人口は年2%ほど、観光客は年4%ほど減り、漁業・農業・商業も少しずつ弱っていきます。最後は「何もしなかった場合」と比べて評価されます。</p>
+    <h4>評価のしくみ（100点満点）</h4><p>関係人口30点、観光消費20点、既存産業の元気20点、新しい産業15点、人口10点、町民の満足度5点。</p>
+    <h4>主な参考情報</h4><ul>
+      <li><a href="https://www.town.minamichita.lg.jp/gyosei/tokei/1001663/1001664.html" target="_blank" rel="noopener">データブック南知多（南知多町）</a></li>
+      <li><a href="https://www.chisou.go.jp/tiiki/tiikisaisei/dai68nintei/plan/a039.pdf" target="_blank" rel="noopener">師崎港観光センター周辺整備運営事業（地域再生計画）</a></li>
+      <li><a href="https://www.mlit.go.jp/sogoseisaku/region/kanko100/pdf/049.pdf" target="_blank" rel="noopener">観光カリスマ百選 日間賀島（国土交通省）</a></li>
+      <li><a href="https://aichinow.pref.aichi.jp/" target="_blank" rel="noopener">愛知県公式観光サイト Aichi Now</a></li></ul>
+    <p class="fine">人物と企業「ミナトテック」は架空です。進行状況はこのブラウザに自動保存されます。メニューの「セーブ」から、手動セーブ（3枠）、別の端末へ引き継ぐセーブコード、これまでの記録を使えます（保存できない環境では、ページを閉じると最初からになります）。</p>
+    ${S ? `<div class="row" style="margin-top:12px"><button class="mbtn" id="btnTitle">タイトルへ戻る</button></div>` : ""}</div>`;
 }
-function fillStatic(){
-  $('#menu3').innerHTML=Object.entries(DISH).map(([k,d])=>`<div>${icon(k)}${d.name}<em>${d.price}円</em></div>`).join('');
-  $('#rcp').innerHTML=`
-    <section><h3>${icon('burger')}しらすライスバーガー（${DISH.burger.price}円）</h3><ol>
-      <li>鉄板でライスのパテを焼く（1個に2枚）</li><li>鉄板で目玉焼きを焼く</li>
-      <li>バーガー台で下から順に重ねる<div class="stack-order">${BURGER_ORDER.map(k=>`<span>${LAYER[k]}</span>`).join('→')}</div></li>
-      <li>最後に紙でくるむ</li></ol></section>
-    <section><h3>${icon('soba')}しらすと大葉の塩焼きそば（${DISH.soba.price}円）</h3><ol>
-      <li>鉄板でやきそばを焼く</li><li>しらすと大葉を入れる</li><li>塩だれとだし塩を振って味をととのえる</li><li>器に盛る</li><li>仕上げにしらすと大葉をのせる</li></ol></section>
-    <section><h3>${icon('soup')}しらすとたまごのスープ（${DISH.soup.price}円）</h3><ol>
-      <li>たまごスープをカップにそそぐ</li><li>ねぎとしらすをのせる</li></ol></section>`;
-  const b=bestScore();$('#best').textContent=b?`自己ベスト：${b.toLocaleString()}円`:'';
+function saveHTML() {
+  const canSave = S && !S.over && S.started !== false;
+  const row = (label, st, at, slotIdx) => `
+    <div class="slot">
+      ${st ? `<img class="mini" src="${faceURL(st.avatar || "pa", "smile")}" style="background:${charBg(st.avatar || "pa")}" alt="">` : `<div class="mini empty" aria-hidden="true"></div>`}
+      <div class="sinfo"><b>${label}</b><span>${st ? esc(`${st.name}　${st.over ? "任期終了" : dateLabel(st.turn)}　Lv${st.lv}　関係人口 ${fmt(st.m.kankei)}人　プロジェクト ${Object.keys(st.projects || {}).length}件`) : "空き"}</span>${at ? `<span class="when">${realDate(at)} に保存</span>` : ""}</div>
+      <div class="sbtns">
+        ${slotIdx !== null ? `<button class="mbtn" data-slot-save="${slotIdx}"${canSave ? "" : " disabled"}>ここに保存</button>` : ""}
+        ${st ? `<button class="mbtn" data-slot-load="${slotIdx === null ? "auto" : slotIdx}">読み込む</button>` : ""}
+      </div>
+    </div>`;
+  const auto = load();
+  const slots = SLOT_KEYS.map((k, i) => { const v = readKey(k); return row(`スロット${i + 1}`, v && validState(v.state) ? v.state : null, v && v.at, i); }).join("");
+  const recs = readKey(REC_KEY) || [];
+  return `<h3>セーブ</h3>
+    <p class="lead">進み具合は、このブラウザに毎回自動で保存されています。手動で残したいときはスロット（3つまで）へ。別のパソコンやスマホで続けるときは「セーブコード」を使ってください。</p>
+    <div class="slots">${row("自動セーブ", auto && validState(auto) && auto.started ? auto : null, null, null)}${slots}</div>
+    <h4 class="h4">セーブコード</h4>
+    <p class="note" style="margin-top:0">今の進み具合を文字列にします。コピーして別の端末に貼り付けると、続きから遊べます。</p>
+    <div class="row"><button class="mbtn" id="btnExport"${S && S.started !== false ? "" : " disabled"}>セーブコードを作る</button><button class="mbtn" id="btnCopy" hidden>コピー</button></div>
+    <textarea class="code" id="codeOut" readonly hidden aria-label="セーブコード"></textarea>
+    <label class="note" for="codeIn" style="display:block;margin-top:12px">セーブコードを貼り付けて読み込む</label>
+    <textarea class="code" id="codeIn" placeholder="TSUNAGU1: で始まる文字列"></textarea>
+    <div class="row"><button class="mbtn" id="btnImport">このコードで読み込む</button></div>
+    <p class="note" id="codeMsg" role="status"></p>
+    <h4 class="h4">これまでの記録</h4>
+    ${recs.length ? `<div class="tbl"><table class="res nw"><thead><tr><th>順位</th><th>名前</th><th>評価</th><th>点数</th><th>関係人口</th><th>新しい産業</th><th>遊んだ日</th></tr></thead><tbody>
+      ${recs.map((r, i) => `<tr><td>${i + 1}</td><td>${esc(r.name)}</td><td>${r.rank}</td><td>${r.total}</td><td>${fmt(r.kankei)}人</td><td>${r.newInd}件</td><td>${realDate(r.at)}</td></tr>`).join("")}</tbody></table></div>`
+      : `<p class="note">まだ記録はありません。3年間の任期を終えると、ここに点数が残ります（このブラウザの中だけの記録です）。</p>`}`;
 }
-
-/* ---------- ranking ---------- */
-async function submitRanking(){
-  const btn=$('#rank-send'),msg=$('#rank-msg'),nick=$('#rank-nick').value.trim();
-  if(!nick){msg.textContent='ニックネームを入れてください。';return;}
-  if(S.submitted){msg.textContent='この結果は送信済みです。';return;}
-  btn.disabled=true;msg.textContent='送信しています…';writeKey('toriyons-nick',nick);
-  const body={action:'submit',nick,money:S.money,rank:rankOf(S.money),sold:S.sold,happy:S.happy,fails:S.fails,mode,
-    version:GAME_VERSION,runId:S.runId,clientId:clientId()};
-  try{
-    // Content-Type を付けない（text/plain）ことで、Apps Script へ事前確認なしで送れる
-    const j=await (await fetch(RANKING_URL,{method:'POST',body:JSON.stringify(body)})).json();
-    if(j.ok){S.submitted=true;writeKey('toriyons-last-run',S.runId);
-      msg.textContent=`送信しました。${mode==='easy'?'やさしい':'ふつう'}部門で ${j.position}位 / ${j.count}件 です。`;btn.textContent='送信済み';return;}
-    msg.textContent={nick:'そのニックネームは使えません。別の名前にしてください。',too_fast:'少し時間をおいてから送ってください。'}[j.error]||'送信できませんでした。';
-  }catch(e){msg.textContent='送信できませんでした。通信状態を確認してください。';}
-  btn.disabled=false;
+function loadState(st) {
+  S = st; if (!S.avatar) S.avatar = "pa"; S.started = true;
+  save(); closeSheet(); render();
+  if (S.over) openSheet("ending"); else idle();
+  toast("セーブデータを読み込みました");
 }
-async function openRanking(){
-  $('#ov-rank').hidden=false;
-  document.querySelectorAll('[data-a="rank-tab"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===rankTab)));
-  const box=$('#rank-list');box.innerHTML='<p class="note">読み込んでいます…</p>';
-  try{
-    const j=await (await fetch(`${RANKING_URL}${RANKING_URL.includes('?')?'&':'?'}action=top&limit=50&mode=${rankTab}`)).json();
-    if(!j.ok)throw new Error('bad');
-    if(!j.rows.length){box.innerHTML='<p class="note">まだ記録がありません。最初の1件を送ってみよう。</p>';return;}
-    const mine=readKey('toriyons-last-run');
-    box.innerHTML=`<table><thead><tr><th>順位</th><th>ニックネーム</th><th style="text-align:right">売上</th><th>ランク</th><th style="text-align:right">提供数</th></tr></thead><tbody>${
-      j.rows.map((r,i)=>`<tr class="${r.runId===mine?'mine':''}"><td class="pos">${i+1}</td><td>${esc(r.nick)}</td><td class="num">${Number(r.money).toLocaleString()}円</td><td>${esc(r.rank)}</td><td class="num">${Number(r.sold)}品</td></tr>`).join('')
-    }</tbody></table><p class="note" style="margin-top:6px">全${j.count}件のうち上位${j.rows.length}件</p>`;
-  }catch(e){box.innerHTML='<p class="note">ランキングを読み込めませんでした。時間をおいて開き直してください。</p>';}
+function confirmClick(btn, label, fn) {
+  if (btn.dataset.armed) { fn(); return; }
+  btn.dataset.armed = "1"; const old = btn.textContent; btn.textContent = label;
+  setTimeout(() => { if (btn.isConnected) { delete btn.dataset.armed; btn.textContent = old; } }, 3000);
 }
-
-/* ---------- BGM（YouTube の公式埋め込みプレーヤーで再生） ----------
-   動画 ID は公開版（GitHub Pages）を作るときだけ window.KITCHEN_BGM_VIDEO に入れる。
-   claude.ai のアーティファクトでは他サイトを埋め込めないため、ID がなければ表示しない。
-   YouTube の規約に合わせ、プレーヤーは隠さず 200px 以上の大きさで見せる。 */
-const BGM_VIDEO=window.KITCHEN_BGM_VIDEO||'';
-let yt=null,ytReady=false,bgmOn=true;
-function loadBgm(){
-  if(!BGM_VIDEO)return;
-  document.querySelectorAll('.bgm-only').forEach(e=>e.hidden=false);
-  window.onYouTubeIframeAPIReady=()=>{
-    yt=new YT.Player('bgm-player',{videoId:BGM_VIDEO,width:'100%',height:'100%',
-      playerVars:{loop:1,playlist:BGM_VIDEO,playsinline:1,rel:0},
-      events:{onReady:()=>{ytReady=true;try{yt.setVolume(40)}catch(e){}syncBgm();}}});
+function bindSave(box) {
+  box.querySelectorAll("[data-slot-save]").forEach((b) => b.addEventListener("click", () => {
+    const i = +b.dataset.slotSave, has = readKey(SLOT_KEYS[i]);
+    const go = () => {
+      const ok = writeKey(SLOT_KEYS[i], { at: new Date().toISOString(), state: S });
+      Sound.se(ok ? "trust" : "bad"); toast(ok ? `スロット${i + 1}に保存しました` : "保存できませんでした（ブラウザの保存領域が使えません）", !ok);
+      openSheet("save");
+    };
+    if (has) confirmClick(b, "上書きする？", go); else go();
+  }));
+  box.querySelectorAll("[data-slot-load]").forEach((b) => b.addEventListener("click", () => {
+    const k = b.dataset.slotLoad;
+    const st = k === "auto" ? load() : (readKey(SLOT_KEYS[+k]) || {}).state;
+    if (!validState(st)) { toast("このデータは読み込めませんでした", true); return; }
+    const go = () => loadState(JSON.parse(JSON.stringify(st)));
+    if (S && S.started && !S.over && k !== "auto") confirmClick(b, "今の進み具合を置き換える？", go); else go();
+  }));
+  const ex = $("#btnExport", box), out = $("#codeOut", box), cp = $("#btnCopy", box), msg = $("#codeMsg", box);
+  if (ex) ex.onclick = () => { out.value = encodeSave(S); out.hidden = false; cp.hidden = false; out.focus(); out.select(); msg.textContent = "セーブコードを作りました。コピーして保管してください。"; };
+  if (cp) cp.onclick = () => {
+    const fallback = () => { out.focus(); out.select(); msg.textContent = "コピーできませんでした。選択された文字列を手動でコピーしてください。"; };
+    try { navigator.clipboard.writeText(out.value).then(() => { msg.textContent = "コピーしました。"; Sound.se("sel"); }, fallback); } catch (e) { fallback(); }
   };
-  const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);
-}
-function syncBgm(fromStart){
-  if(!ytReady)return;
-  try{
-    if(bgmOn&&S&&S.running&&!S.over){if(fromStart)yt.seekTo(0,true);yt.playVideo();}
-    else yt.pauseVideo();
-  }catch(e){}
+  const im = $("#btnImport", box);
+  if (im) im.onclick = () => {
+    const st = decodeSave($("#codeIn", box).value);
+    if (!st) { msg.textContent = "セーブコードを読み取れませんでした。「TSUNAGU1:」から最後まで、欠けずに貼り付けられているか確かめてください。"; Sound.se("bad"); return; }
+    if (S && S.started && !S.over) confirmClick(im, "今の進み具合を置き換える？", () => loadState(st)); else loadState(st);
+  };
 }
 
-/* ---------- toast & sound ---------- */
-function toast(msg,type=''){
-  const box=$('#toasts'),t=document.createElement('div');
-  t.className='toast '+type;t.textContent=msg;box.appendChild(t);
-  while(box.children.length>3)box.firstChild.remove();
-  setTimeout(()=>t.classList.add('out'),1600);setTimeout(()=>t.remove(),2000);
-}
-function beep(f=600,d=.07,type='sine',vol=.05){
-  if(muted||!audio)return;
-  try{const o=audio.createOscillator(),g=audio.createGain(),t=audio.currentTime;
-    o.type=type;o.frequency.value=f;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);
-    o.connect(g).connect(audio.destination);o.start(t);o.stop(t+d+.02);}catch(e){}
+function endingHTML() {
+  const { parts, total, b } = score();
+  const m = S.m;
+  const rank = total >= 80 ? "S" : total >= 60 ? "A" : total >= 40 ? "B" : total >= 20 ? "C" : "D";
+  const titles = { S: "海と人をつないだ協力隊", A: "町の未来に火をともした人", B: "町に新しい風を吹かせた人", C: "町を知り、町に知られた人", D: "これから始まる物語" };
+  const names = Object.keys(S.projects).map((id) => PROJ[id].name);
+  let epi;
+  if (m.newInd >= 3) epi = `${S.name}さんは任期のあとも南知多に残り、地元の仲間と会社を立ち上げた。生まれた仕事は${m.newInd}つ。町の若い人が「ここで働きたい」と言うようになった。`;
+  else if (names.length >= 4) epi = `${S.name}さんが始めたプロジェクトは、地元の人たちの手で続いていく。町を離れても、${S.name}さんは南知多のいちばんの「関係人口」だ。`;
+  else if (names.length >= 1) epi = `始めたプロジェクトは小さな一歩だった。でも、町の人たちは「次は自分たちでやってみる」と言った。`;
+  else epi = `3年で町を変えるのは簡単ではなかった。それでも、出会った人たちとの縁は残っている。もう一度、最初から挑戦してみよう。`;
+  const r = (label, now, base, startV, f) => `<tr><td>${label}</td><td>${f(startV)}</td><td>${f(base)}</td><td><b>${f(now)}</b></td></tr>`;
+  const pct = (v) => (v * 100).toFixed(1) + "%";
+  return `<p class="sec-label">任期終了　${dateLabel(TOTAL_TURNS - 1)}</p>
+    <div class="row" style="align-items:center;gap:20px"><div class="rank">${rank}</div><div><h3>${titles[rank]}</h3><p class="lead" style="margin:0">総合 ${total}点 ／ 100点</p></div></div>
+    <p>${esc(epi)}</p>
+    ${(() => { const fr = Object.keys(NPC).filter((id) => S.met[id] && trust(id) >= 3);
+      return fr.length ? `<p class="sec-label">3年間で信頼を結んだ仲間たち</p><div class="friends">${fr.map((id) => `<div class="friend"><img src="${faceURL(id, "smile")}" style="background:${charBg(id)}" alt="">${esc(NPC[id].name)}</div>`).join("")}</div>` : ""; })()}
+    <div class="tbl"><table class="res"><thead><tr><th>指標</th><th>開始時</th><th>何もしなかった場合</th><th>あなたの3年</th></tr></thead><tbody>
+      ${r("町の人口", m.pop, b.pop, START.pop, (v) => fmt(v) + "人")}
+      ${r("関係人口", m.kankei, b.kankei, START.kankei, (v) => fmt(v) + "人")}
+      ${r("年間観光客（推計）", annualTourists(m), annualTourists(b), annualTourists(START), (v) => (v / 10000).toFixed(1) + "万人")}
+      ${r("宿泊する人の割合", m.stay, b.stay, START.stay, pct)}
+      ${r("年間観光消費額（推計）", annualSpend(m), annualSpend(b), annualSpend(START), (v) => (v / 1e8).toFixed(1) + "億円")}
+      ${r("漁業の元気", m.fish, b.fish, START.fish, (v) => v.toFixed(1))}
+      ${r("農業の元気", m.agri, b.agri, START.agri, (v) => v.toFixed(1))}
+      ${r("観光・商業の元気", m.shop, b.shop, START.shop, (v) => v.toFixed(1))}
+      ${r("町民の満足度", m.sat, b.sat, START.sat, (v) => v.toFixed(1))}
+      ${r("新しい産業", m.newInd, 0, 0, (v) => v + "件")}
+    </tbody></table></div>
+    <div class="tbl" style="margin-top:12px"><table class="res"><thead><tr><th>評価の内訳</th><th>得点</th><th>満点</th></tr></thead><tbody>
+      ${parts.map((p) => `<tr><td>${p[0]}</td><td>${Math.round(p[1])}</td><td>${p[2]}</td></tr>`).join("")}</tbody></table></div>
+    <p class="note">実施したプロジェクト：${names.length ? names.map(esc).join("、") : "なし"}</p>
+    ${RANKING_URL ? `<div class="rankbox">
+      <p class="h4" style="margin-top:0">みんなのランキングに参加する</p>
+      ${S.submitted ? `<p class="note" style="margin-top:0">この結果はランキングに送信済みです。</p>` : `
+      <div class="field" style="margin:6px 0"><label for="rankNick">ニックネーム（12文字まで）</label><input id="rankNick" maxlength="12" value="${esc(S.name)}"></div>
+      <label class="agree"><input type="checkbox" id="rankAgree"> ニックネームと点数がランキングで公開されることに同意します（本名やメールアドレスは入れないでください）</label>
+      <div class="row" style="margin-top:8px"><button class="go" id="btnSubmitRank" disabled>ランキングに送る</button></div>`}
+      <p class="note" id="rankMsg" role="status"></p>
+    </div>` : ""}
+    <div class="row" style="margin-top:14px"><button class="go" id="btnAgain">もう一度あそぶ</button><button class="mbtn" id="btnLoadSave">これまでの記録を見る</button>${RANKING_URL ? `<button class="mbtn" id="btnShowRank">みんなのランキング</button>` : ""}</div>
+    <p class="fine">数字はゲーム用の推計です。地名・施設・統計は公開情報にもとづき、人物と企業は架空です。</p>`;
 }
 
-/* ---------- input ---------- */
-document.addEventListener('click',e=>{
-  const b=e.target.closest('[data-a]');if(!b||b.disabled)return;
-  const a=b.dataset.a,v=b.dataset.v,i=b.dataset.i!==undefined?+b.dataset.i:undefined;
-  if(a==='start'){
-    if(!audio){try{audio=new (window.AudioContext||window.webkitAudioContext)()}catch(err){}}
-    ['#ov-start','#ov-result','#ov-recipe','#ov-pause','#ov-rank'].forEach(s=>$(s).hidden=true);newGame(v);syncBgm(true);return;
+function bindSheet(kind) {
+  const box = $("#sheetIn");
+  box.querySelectorAll("[data-start]").forEach((b) => b.addEventListener("click", () => startProject(b.dataset.start)));
+  const nb = $("#btnNew", box); if (nb) nb.onclick = () => { const name = ($("#playerName").value || "みなみ").trim().slice(0, 10) || "みなみ"; startNew(name, titleAv); };
+  box.querySelectorAll("[data-av]").forEach((b) => b.addEventListener("click", () => {
+    titleAv = b.dataset.av; Sound.se("sel");
+    box.querySelectorAll("[data-av]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  }));
+  const cb = $("#btnCont", box); if (cb) cb.onclick = () => { S = load(); closeSheet(); render(); idle(); };
+  const hb = $("#btnHelp", box); if (hb) hb.onclick = () => openSheet("help");
+  const tb = $("#btnTitle", box); if (tb) tb.onclick = () => openSheet("title");
+  const ab = $("#btnAgain", box); if (ab) ab.onclick = () => { clearSave(); S = null; Sound.bgm("field"); openSheet("title"); };
+  box.querySelectorAll("[data-sound]").forEach((b) => b.addEventListener("click", toggleSound));
+  const lb = $("#btnLoadSave", box); if (lb) lb.onclick = () => openSheet("save");
+  if (kind === "save") bindSave(box);
+  const sr = $("#btnShowRank", box); if (sr) sr.onclick = () => openSheet("rank");
+  if (kind === "rank") loadRanking(box);
+  const ag = $("#rankAgree", box), sb = $("#btnSubmitRank", box);
+  if (ag && sb) {
+    ag.onchange = () => { sb.disabled = !ag.checked; };
+    sb.onclick = async () => {
+      const nick = ($("#rankNick", box).value || "").trim();
+      const msg = $("#rankMsg", box);
+      if (!nick) { msg.textContent = RANK_ERR.nick; return; }
+      sb.disabled = true; msg.textContent = "送信しています…";
+      try {
+        const j = await postResult(nick);
+        if (j.ok) { Sound.se("project"); msg.textContent = `送信しました！ 今のところ ${j.position}位（全${j.count}件）です。`; sb.textContent = "送信済み"; }
+        else { Sound.se("bad"); msg.textContent = RANK_ERR[j.error] || "送信できませんでした。"; sb.disabled = false; }
+      } catch (e) { Sound.se("bad"); msg.textContent = "通信できませんでした。インターネットにつながっているか確かめてください。"; sb.disabled = false; }
+    };
   }
-  if(a==='title'){$('#ov-result').hidden=true;fillStatic();$('#ov-start').hidden=false;return;}
-  if(a==='recipe'){if(S&&!S.over)S.running=false;$('#ov-recipe').hidden=false;syncBgm();return;}
-  if(a==='close-recipe'){$('#ov-recipe').hidden=true;if(S&&!S.over&&$('#ov-pause').hidden)S.running=true;syncBgm();return;}
-  if(b.closest('#ov-menu')&&a!=='bgm'&&a!=='sound')$('#ov-menu').hidden=true;
-  if(a==='menu'){$('#ov-menu').hidden=false;return;}
-  if(a==='menu-close')return;
-  if(a==='tab'){setTab(v);return;}
-  if(a==='rank-open'){openRanking();return;}
-  if(a==='rank-close'){$('#ov-rank').hidden=true;return;}
-  if(a==='rank-tab'){rankTab=v;openRanking();return;}
-  if(a==='rank-send'){submitRanking();return;}
-  if(a==='sound'){muted=!muted;document.querySelectorAll('[data-a="sound"]').forEach(x=>x.textContent=muted?'効果音 OFF':'効果音 ON');return;}
-  if(a==='bgm'){bgmOn=!bgmOn;document.querySelectorAll('[data-a="bgm"]').forEach(x=>x.textContent=bgmOn?'BGM ON':'BGM OFF');syncBgm();return;}
-  if(a==='quit'){if(!S||S.over||!$('#ov-start').hidden)return;S.running=false;$('#ov-quit').hidden=false;syncBgm();return;}
-  if(a==='quit-no'){$('#ov-quit').hidden=true;if(S&&!S.over&&$('#ov-pause').hidden)S.running=true;syncBgm();return;}
-  if(a==='quit-yes'){if(!S||S.over)return;$('#ov-quit').hidden=true;$('#ov-pause').hidden=true;endGame('quit');return;}
-  if(a==='pause'){if(!S||S.over)return;S.running=!S.running;$('#ov-pause').hidden=S.running;syncBgm();return;}
-  if(!S||!S.running||S.over)return;
-  if(A[a])A[a](v,i);
+}
+
+function rankHTML() {
+  return `<h3>みんなのランキング</h3>
+    <p class="lead">任期を終えた人たちの点数の上位50件です。同じ点数なら、関係人口が多い順です。</p>
+    <div id="rankBody"><p class="note">読み込んでいます…</p></div>
+    <p class="fine">ランキングにはニックネームと結果だけが表示されます。不適切な名前を見つけた場合は、運営者が非表示にすることがあります。</p>`;
+}
+async function loadRanking(box) {
+  const el = $("#rankBody", box);
+  try {
+    const j = await fetchRanking();
+    if (!el.isConnected) return;
+    const mine = new Set(myRuns());
+    el.innerHTML = j.rows.length ? `<div class="tbl"><table class="res nw"><thead><tr><th>順位</th><th>ニックネーム</th><th>評価</th><th>点数</th><th>関係人口</th><th>新しい産業</th><th>日付</th></tr></thead><tbody>
+      ${j.rows.map((r, i) => `<tr${mine.has(r.runId) ? ' class="me"' : ""}><td>${i + 1}</td><td><span class="rn"><img src="${faceURL(CHAR[r.avatar] ? r.avatar : "pa", "smile")}" style="background:${charBg(CHAR[r.avatar] ? r.avatar : "pa")}" alt="">${esc(r.nick)}${mine.has(r.runId) ? "（あなた）" : ""}</span></td><td>${esc(r.rank)}</td><td>${Number(r.total) || 0}</td><td>${fmt(Number(r.kankei) || 0)}人</td><td>${Number(r.newInd) || 0}件</td><td>${realDate(r.at).split(" ")[0]}</td></tr>`).join("")}
+      </tbody></table></div><p class="note">参加者 ${j.count}件</p>` : `<p class="note">まだ誰も参加していません。最初の挑戦者になろう！</p>`;
+  } catch (e) {
+    if (el.isConnected) el.innerHTML = `<p class="note">ランキングを読み込めませんでした。時間をおいて開き直してください。</p>`;
+  }
+}
+
+function toggleSound() {
+  const on = Sound.toggle();
+  document.querySelectorAll("[data-sound]").forEach((b) => { b.textContent = `音 ${on ? "ON" : "OFF"}`; b.setAttribute("aria-pressed", String(on)); });
+  if (on) Sound.se("sel");
+}
+
+/* =========================================================
+   開始
+   ========================================================= */
+let titleAv = "pa";
+async function startNew(name, avatar) {
+  clearSave();
+  S = newState(name); S.started = true; S.avatar = avatar || "pa";
+  closeSheet(); render();
+  busy = true; render();
+  try {
+    await say(null, "2026年4月。名鉄知多新線の終点、内海駅。\n改札を出ると、潮のにおいがした。");
+    await say("浜田みのり", `「${name}さんですね！ 南知多町役場、産業振興課の浜田です。今日から3年間、地域おこし協力隊としてよろしくお願いします」`);
+    await say("浜田みのり", "「この町の人口は、町ができた1961年の約3万人から、今はおよそ半分。観光客も2016年の342万人から、2024年は179万人まで減りました」");
+    await say("浜田みのり", "「でも、海も島も、魚も畑も、人も、まだまだ面白いんです。お願いしたいことは3つ」");
+    await say("浜田みのり", "「町の隠れた魅力と課題を見つけること。この町に何度も関わってくれる『関係人口』を増やすこと。そして漁業・農業・観光を元気にして、新しい仕事を生み出すこと」");
+    await say("浜田みのり", "「毎月使える行動力には限りがあります。歩いて探して、人と話して、手伝って。見つけた魅力と地元の人の信頼がそろったら、プロジェクトを始めましょう」");
+    await say("浜田みのり", "「まずは、この内海の町を歩いてみてください。困ったら豊浜の役場にいますね」");
+    S.met.hamada = true; S.trust.hamada = 1;
+  } finally { busy = false; save(); render(); idle(); }
+}
+
+document.querySelectorAll("[data-sheet]").forEach((b) => b.addEventListener("click", () => openSheet(b.dataset.sheet)));
+$("#btnSound").addEventListener("click", toggleSound);
+$("#menuRank").hidden = !RANKING_URL;
+$("#btnSound").textContent = `音 ${Sound.isOn() ? "ON" : "OFF"}`;
+$("#btnSound").setAttribute("aria-pressed", String(Sound.isOn()));
+$("#sheet").addEventListener("click", (e) => { if (e.target.id === "sheet" && sheetKind !== "title" && sheetKind !== "ending") closeSheet(); });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && sheetKind && sheetKind !== "title" && sheetKind !== "ending") { closeSheet(); return; }
+  if ((e.key === "Enter" || e.key === " ") && !sheetKind && document.activeElement && document.activeElement.tagName !== "INPUT") {
+    const btns = document.querySelectorAll("#choices .ch");
+    if (btns.length === 1 && document.activeElement !== btns[0]) { e.preventDefault(); btns[0].click(); }
+  }
 });
 
-fillStatic();
-document.querySelectorAll('.rank-only').forEach(e=>e.hidden=!RANKING_URL);
-loadBgm();
-buildTabs();
-newGame('easy');S.running=false;
-S.customers.push({id:0,order:['burger','soup'],done:[false,false],p:40,max:52,age:9,mood:'happy',say:'',sayT:0,finished:false,leaveIn:0,
-  look:{skin:'#f6d3b3',hair:'#5a3a22',shirt:'#f2c94c',style:1}});
-S.grill[0]={type:'patty',t:3,log:[]};S.grill[2]={type:'soba',t:7,log:['shirasu_ooba']};
-S.burger=['rice','lettuce','egg'];renderAll();
-requestAnimationFrame(loop);
+function boot(data) {
+  buildMap();
+  if (data && data.state) { S = data.state; render(); if (S.over) openSheet("ending"); else idle(); return; }
+  S = null;
+  // タイトルの背景として仮の状態を描く
+  S = newState("みなみ"); render(); S = null;
+  show(null, "南知多町へようこそ。", null);
+  openSheet("title");
+}
+try { window.claude?.hot?.snapshot?.(() => ({ state: S })); } catch (e) {}
+if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 </script>
 </body>
 </html>
